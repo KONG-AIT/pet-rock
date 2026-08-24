@@ -167,6 +167,35 @@ describe('app initialization', () => {
 })
 
 describe('game actions', () => {
+  it('continues processing mutations after an unexpected action failure', async () => {
+    const storage = new RecordingStorage(initialState())
+    let shouldThrow = true
+    const app = createAppStore({
+      storage,
+      now: () => ADOPTED_AT,
+      selectPlant: () => {
+        if (shouldThrow) {
+          throw new Error('Unexpected selector failure')
+        }
+
+        return 'plant-01'
+      },
+    })
+    await app.initialize()
+
+    await expect(app.actions.plantSeed()).rejects.toThrow('Unexpected selector failure')
+
+    shouldThrow = false
+    await expect(app.actions.plantSeed()).resolves.toEqual({
+      ok: true,
+      value: undefined,
+    })
+    expect(app.getSnapshot().gameState?.plantGrowth).toMatchObject({
+      status: 'growing',
+      resultPlantId: 'plant-01',
+    })
+  })
+
   it('reflects a new game only after it has been saved', async () => {
     const storage = new RecordingStorage(null)
     const app = store(storage)
@@ -227,6 +256,61 @@ describe('game actions', () => {
         stage: 'growing',
       })
     }
+    expect(storage.saves).toHaveLength(0)
+  })
+
+  it('persists completed growth when refreshing the elapsed growth view', async () => {
+    const planted = unwrap(plantSeed(initialState(), ADOPTED_AT, () => 'plant-03'))
+    const storage = new RecordingStorage(planted)
+    let currentTime = ADOPTED_AT
+    const app = createAppStore({
+      storage,
+      now: () => currentTime,
+      selectPlant: () => 'plant-01',
+    })
+    await app.initialize()
+    currentTime = ADOPTED_AT + GROWTH_COMPLETE_MS
+
+    expect(await app.actions.refreshGrowth()).toEqual({ ok: true, value: undefined })
+
+    const snapshot = app.getSnapshot()
+    expect(snapshot).toMatchObject({
+      status: 'ready',
+      gameState: {
+        plantGrowth: {
+          status: 'completed',
+          completedAt: ADOPTED_AT + GROWTH_COMPLETE_MS,
+          plantId: 'plant-03',
+        },
+      },
+      observedAt: currentTime,
+    })
+    expect(storage.state).toEqual(
+      snapshot.status === 'ready' ? snapshot.gameState : null,
+    )
+    expect(storage.saves).toHaveLength(1)
+  })
+
+  it('keeps the current state when refreshed growth cannot be saved', async () => {
+    const planted = unwrap(plantSeed(initialState(), ADOPTED_AT, () => 'plant-02'))
+    const storage = new RecordingStorage(planted)
+    let currentTime = ADOPTED_AT
+    const app = createAppStore({
+      storage,
+      now: () => currentTime,
+      selectPlant: () => 'plant-01',
+    })
+    await app.initialize()
+    const before = app.getSnapshot()
+    currentTime = ADOPTED_AT + GROWTH_COMPLETE_MS
+    storage.saveError = { code: 'write_failed' }
+
+    expect(await app.actions.refreshGrowth()).toEqual({
+      ok: false,
+      error: { source: 'storage', error: { code: 'write_failed' } },
+    })
+    expect(app.getSnapshot()).toBe(before)
+    expect(storage.state).toBe(planted)
     expect(storage.saves).toHaveLength(0)
   })
 

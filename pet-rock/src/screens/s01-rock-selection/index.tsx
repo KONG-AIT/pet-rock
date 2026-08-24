@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 
-import { useGameActions } from '../../app/index'
+import { useGameActions, useTransientHistoryEntry } from '../../app/index'
 import { SelectionRockVisual } from '../../components/visuals'
 import type { RockId } from '../../domain'
 import {
@@ -26,7 +26,6 @@ export function RockSelectionScreen() {
   const [wasNameTouched, setWasNameTouched] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
-  const overlayHistoryActive = useRef(false)
 
   function resetOverlay() {
     setDraft(cancelSelection())
@@ -35,52 +34,37 @@ export function RockSelectionScreen() {
     setSaveError(null)
   }
 
+  const overlayHistoryEntry = useTransientHistoryEntry(
+    HISTORY_STATE_KEY,
+    resetOverlay,
+  )
+
   function closeOverlay() {
     if (isSubmitting) {
       return
     }
 
-    if (overlayHistoryActive.current) {
-      window.history.back()
-      return
+    if (!overlayHistoryEntry.close()) {
+      resetOverlay()
     }
-
-    resetOverlay()
   }
 
   useEffect(() => {
-    function handleBack() {
-      if (!overlayHistoryActive.current) {
-        return
-      }
-
-      overlayHistoryActive.current = false
-      resetOverlay()
-    }
-
     function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === 'Escape' && overlayHistoryActive.current) {
+      if (event.key === 'Escape' && draft !== null) {
         closeOverlay()
       }
     }
 
-    window.addEventListener('popstate', handleBack)
     window.addEventListener('keydown', handleKeyDown)
 
     return () => {
-      window.removeEventListener('popstate', handleBack)
       window.removeEventListener('keydown', handleKeyDown)
     }
   })
 
   function selectRock(rockId: RockId) {
-    if (!overlayHistoryActive.current) {
-      window.history.pushState(
-        { ...window.history.state, [HISTORY_STATE_KEY]: true },
-        '',
-      )
-      overlayHistoryActive.current = true
-    }
+    overlayHistoryEntry.open()
 
     setDraft(createSelectionDraft(rockId))
     setWasNameTouched(false)
@@ -111,10 +95,7 @@ export function RockSelectionScreen() {
       return
     }
 
-    if (overlayHistoryActive.current) {
-      overlayHistoryActive.current = false
-      window.history.back()
-    }
+    overlayHistoryEntry.close()
   }
 
   const confirmedSelection = draft === null ? null : getConfirmedSelection(draft)
