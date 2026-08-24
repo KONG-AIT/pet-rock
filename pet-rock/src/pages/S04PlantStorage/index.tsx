@@ -52,7 +52,7 @@ function Preview({
       <p className="storage-preview__eyebrow">내 돌 미리보기</p>
       <div className="storage-preview__scene">
         {plantId !== null && (
-          <span className="storage-preview__plant">
+          <span key={plantId} className="storage-preview__plant">
             <PlantVisual plantId={plantId} />
           </span>
         )}
