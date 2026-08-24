@@ -1,6 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 
-import { useAppNavigation, useGameQueries } from '../../app/index'
+import {
+  useAppNavigation,
+  useGameQueries,
+  useTransientHistoryEntry,
+} from '../../app/index'
 import {
   createDefaultRockShareService,
   shareRock,
@@ -27,28 +31,11 @@ export function HomeScreen({
   const [menuOpen, setMenuOpen] = useState(false)
   const [reacting, setReacting] = useState(false)
   const [reactionKey, setReactionKey] = useState(0)
-  const menuHistoryEntry = useRef(false)
   const reactionTimer = useRef<number | null>(null)
-
-  useEffect(() => {
-    function handleSystemBack() {
-      if (!menuHistoryEntry.current) {
-        return
-      }
-
-      menuHistoryEntry.current = false
-      setMenuOpen(nextMenuOpenState(true, 'system-back'))
-    }
-
-    window.addEventListener('popstate', handleSystemBack)
-    return () => {
-      window.removeEventListener('popstate', handleSystemBack)
-      if (menuHistoryEntry.current) {
-        menuHistoryEntry.current = false
-        window.history.back()
-      }
-    }
-  }, [])
+  const menuHistoryEntry = useTransientHistoryEntry(
+    'petRockS02ActionMenu',
+    () => setMenuOpen(nextMenuOpenState(true, 'system-back')),
+  )
 
   useEffect(
     () => () => {
@@ -67,18 +54,14 @@ export function HomeScreen({
   const model = createHomeRenderModel(currentGameState, growth)
 
   function unwindMenuHistory() {
-    if (menuHistoryEntry.current) {
-      menuHistoryEntry.current = false
-      window.history.back()
-    }
+    menuHistoryEntry.close()
   }
 
   function toggleMenu() {
     const nextOpen = nextMenuOpenState(menuOpen, 'action-button')
 
     if (nextOpen) {
-      window.history.pushState({ s02ActionMenu: true }, '', window.location.href)
-      menuHistoryEntry.current = true
+      menuHistoryEntry.open()
     } else {
       unwindMenuHistory()
     }
