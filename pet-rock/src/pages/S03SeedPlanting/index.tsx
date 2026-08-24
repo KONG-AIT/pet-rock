@@ -17,6 +17,18 @@ import './S03SeedPlanting.css'
 
 type PendingAction = 'plant' | 'equip' | 'store' | null
 
+function viewStateMotionKey(viewState: SeedPlantingViewState): string {
+  switch (viewState.status) {
+    case 'unavailable':
+    case 'empty':
+      return viewState.status
+    case 'growing':
+      return `${viewState.status}-${viewState.stage}`
+    case 'completed':
+      return `${viewState.status}-${viewState.plantId}`
+  }
+}
+
 function SeedIcon() {
   return (
     <svg className="s03-seed" viewBox="0 0 56 56" aria-hidden="true">
@@ -281,6 +293,7 @@ export function S03SeedPlantingPage() {
         <h1>씨앗 심기</h1>
       </header>
       <SeedPlantingContent
+        key={viewStateMotionKey(viewState)}
         viewState={viewState}
         pendingAction={pendingAction}
         onPlant={() => void runAction('plant', actions.plantSeed)}

@@ -429,6 +429,37 @@
   50% { transform: rotate(1.5deg); }
 }
 
+@media (prefers-reduced-motion: no-preference) {
+  .s03-state {
+    animation: s03-state-enter 220ms cubic-bezier(0.22, 0.72, 0.24, 1) both;
+  }
+
+  .s03-state--growing .s03-pot {
+    animation: s03-pot-settle 300ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    transform-origin: 50% 82%;
+  }
+
+  .s03-state--completed .s03-completed-plant {
+    animation: s03-plant-reveal 320ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    transform-origin: 50% 88%;
+  }
+}
+
+@keyframes s03-state-enter {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes s03-pot-settle {
+  from { opacity: 0.7; transform: translateY(10px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes s03-plant-reveal {
+  from { opacity: 0; transform: translateY(10px) scale(0.94); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
 @media (max-width: 480px) {
   .s03-state {
     min-height: calc(100svh - 100px);
@@ -455,6 +486,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .s03-state,
+  .s03-state--growing .s03-pot,
+  .s03-state--completed .s03-completed-plant,
   .s03-visual--empty > .s03-seed,
   .s03-sprout--planted,
   .s03-sprout--growing,

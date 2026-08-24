@@ -692,9 +692,12 @@ button.plant-card {
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  #plants-panel,
+  #plants-panel {
+    animation: storage-panel-enter-from-left 200ms cubic-bezier(0.22, 0.72, 0.24, 1) both;
+  }
+
   #seeds-panel {
-    animation: storage-panel-enter 190ms ease-out both;
+    animation: storage-panel-enter-from-right 200ms cubic-bezier(0.22, 0.72, 0.24, 1) both;
   }
 
   .storage-preview__plant {
@@ -730,15 +733,27 @@ button.plant-card {
   }
 }
 
-@keyframes storage-panel-enter {
+@keyframes storage-panel-enter-from-left {
   from {
     opacity: 0;
-    transform: translateY(7px);
+    transform: translateX(-8px);
   }
 
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateX(0);
+  }
+}
+
+@keyframes storage-panel-enter-from-right {
+  from {
+    opacity: 0;
+    transform: translateX(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
   }
 }
 
