@@ -1,0 +1,8 @@
+{
+  "setup": {
+    "windows": [
+      "git fetch origin",
+      "git status --short --branch"
+    ]
+  }
+}
