@@ -184,7 +184,8 @@
   overflow: visible;
 }
 
-.s03-visual--empty .s03-pot {
+.s03-visual--empty .s03-pot,
+.s03-state--growing .s03-pot {
   margin-top: 58px;
 }
 
