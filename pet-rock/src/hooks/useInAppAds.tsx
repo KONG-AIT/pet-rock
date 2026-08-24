@@ -20,15 +20,20 @@ interface UseInAppAdsReturn {
 export function useInAppAds(adGroupId: string): UseInAppAdsReturn {
   const [isAdLoaded, setIsAdLoaded] = useState(false);
   const [lastReward, setLastReward] = useState<Reward | null>(null);
-  const [isSupported, setIsSupported] = useState(false);
+  const [isSupported] = useState(() => {
+    try {
+      return loadFullScreenAd.isSupported();
+    } catch (error) {
+      console.error("광고 지원 여부 확인 실패:", error);
+      return false;
+    }
+  });
   const unregisterRef = useRef<(() => void) | null>(null);
 
   /**
    * 광고를 로드해요.
    */
   const load = useCallback(() => {
-    setIsAdLoaded(false);
-
     try {
       unregisterRef.current = loadFullScreenAd({
         options: { adGroupId },
@@ -50,15 +55,8 @@ export function useInAppAds(adGroupId: string): UseInAppAdsReturn {
   }, [adGroupId]);
 
   useEffect(() => {
-    try {
-      setIsSupported(loadFullScreenAd.isSupported());
-
-      if (loadFullScreenAd.isSupported()) {
-        load();
-      }
-    } catch (error) {
-      console.error("광고 지원 여부 확인 실패:", error);
-      setIsSupported(false);
+    if (isSupported) {
+      load();
     }
 
     return () => {
@@ -68,7 +66,7 @@ export function useInAppAds(adGroupId: string): UseInAppAdsReturn {
         console.error("광고 정리(cleanup) 중 에러:", error);
       }
     };
-  }, [load]);
+  }, [isSupported, load]);
 
   /**
    * 광고를 실제로 화면에 표시해요.
