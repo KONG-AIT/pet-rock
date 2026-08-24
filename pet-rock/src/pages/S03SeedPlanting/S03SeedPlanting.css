@@ -20,7 +20,7 @@
 
 .s03-header {
   position: relative;
-  min-height: 68px;
+  min-height: 78px;
   display: grid;
   place-items: center;
   border-bottom: 1px solid rgba(55, 49, 39, 0.1);
@@ -36,10 +36,10 @@
 
 .s03-back-button {
   position: absolute;
-  left: 18px;
+  left: 16px;
   top: 50%;
-  width: 42px;
-  height: 42px;
+  width: 44px;
+  height: 44px;
   padding: 0;
   border: 0;
   border-radius: 50%;
@@ -50,11 +50,14 @@
   cursor: pointer;
 }
 
-.s03-back-button span {
-  margin-top: -4px;
-  font-size: 39px;
-  font-weight: 300;
-  line-height: 1;
+.s03-back-button svg {
+  width: 25px;
+  height: 25px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .s03-back-button:focus-visible,
@@ -66,7 +69,7 @@
 .s03-state {
   flex: 1;
   min-height: 620px;
-  padding: 28px 28px 30px;
+  padding: 54px 28px 30px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -252,10 +255,65 @@
   box-shadow: 0 5px 18px rgba(67, 58, 44, 0.1);
   font-size: 19px;
   font-weight: 750;
+  border: 0;
+  font-family: inherit;
+  cursor: pointer;
+  transition: transform 140ms ease, background-color 140ms ease;
+}
+
+.s03-mystery:hover,
+.s03-mystery[aria-expanded='true'] {
+  color: #fff;
+  background: var(--s03-green);
+}
+
+.s03-mystery:active {
+  transform: scale(0.94);
+}
+
+.s03-mystery:focus-visible {
+  outline: 3px solid rgba(85, 119, 70, 0.35);
+  outline-offset: 3px;
+}
+
+.s03-growth-details {
+  min-height: 82px;
+  margin-top: -4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.s03-remaining-time {
+  min-height: 36px;
+  padding: 0 13px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--s03-muted);
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: 0 5px 18px rgba(67, 58, 44, 0.08);
+  font-size: 13px;
+}
+
+.s03-remaining-time svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: var(--s03-green);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.s03-remaining-time strong {
+  color: var(--s03-ink);
+  font-size: 14px;
 }
 
 .s03-growing-note {
-  margin-top: -3px;
   color: var(--s03-muted);
   font-size: 14px;
 }
@@ -307,11 +365,11 @@
 }
 
 .s03-state--growing {
-  padding-top: 48px;
+  padding-top: 72px;
 }
 
 .s03-state--completed {
-  padding-top: 35px;
+  padding-top: 62px;
 }
 
 .s03-state--completed .s03-copy {
@@ -415,7 +473,7 @@
 
 @media (max-width: 480px) {
   .s03-state {
-    min-height: calc(100svh - 90px);
+    min-height: calc(100svh - 100px);
     padding-inline: 22px;
   }
 

@@ -1,9 +1,18 @@
 import { useEffect, useState } from 'react'
 
-import { useAppNavigation, useGameActions, useGameQueries } from '../../app/index'
+import {
+  useAppNavigation,
+  useAppSnapshot,
+  useGameActions,
+  useGameQueries,
+} from '../../app/index'
 import type { AppActionResult } from '../../app/index'
 import type { PlantId } from '../../domain'
-import { getSeedPlantingViewState, type SeedPlantingViewState } from './view-state'
+import {
+  formatRemainingTime,
+  getSeedPlantingViewState,
+  type SeedPlantingViewState,
+} from './view-state'
 import './S03SeedPlanting.css'
 
 type PendingAction = 'plant' | 'equip' | 'store' | null
@@ -79,17 +88,21 @@ function CompletedPlant({ plantId }: { plantId: PlantId }) {
 type SeedPlantingContentProps = Readonly<{
   viewState: SeedPlantingViewState
   pendingAction: PendingAction
+  showGrowthHint: boolean
   onPlant(): void
   onEquip(): void
   onStore(): void
+  onToggleGrowthHint(): void
 }>
 
 export function SeedPlantingContent({
   viewState,
   pendingAction,
+  showGrowthHint,
   onPlant,
   onEquip,
   onStore,
+  onToggleGrowthHint,
 }: SeedPlantingContentProps) {
   if (viewState.status === 'unavailable') {
     return (
@@ -144,12 +157,34 @@ export function SeedPlantingContent({
           <p className="s03-state__description">어떤 식물이 될까요?</p>
         </div>
         <div className="s03-visual">
-          <span className="s03-mystery" aria-hidden="true">?</span>
+          <button
+            className="s03-mystery"
+            type="button"
+            aria-label="성장 안내 보기"
+            aria-expanded={showGrowthHint}
+            onClick={onToggleGrowthHint}
+          >
+            ?
+          </button>
           <PotIllustration stage={viewState.stage} />
         </div>
-        <p className="s03-growing-note">
-          {isPlanted ? '흙 속에서 작은 변화가 시작됐어요.' : '완성까지 조금만 더 기다려주세요.'}
-        </p>
+        <div className="s03-growth-details">
+          <div className="s03-remaining-time" aria-label={`남은 시간 ${formatRemainingTime(viewState.remainingMs)}`}>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="8.5" />
+              <path d="M12 7.5v5l3.2 1.8" />
+            </svg>
+            <span>남은 시간</span>
+            <strong>{formatRemainingTime(viewState.remainingMs)}</strong>
+          </div>
+          <p className="s03-growing-note">
+            {showGrowthHint
+              ? '다 자라기 전까지 어떤 식물인지는 비밀이에요.'
+              : isPlanted
+                ? '흙 속에서 작은 변화가 시작됐어요.'
+                : '완성까지 조금만 더 기다려주세요.'}
+          </p>
+        </div>
       </section>
     )
   }
@@ -190,10 +225,13 @@ export function SeedPlantingContent({
 export function S03SeedPlantingPage() {
   const actions = useGameActions()
   const navigation = useAppNavigation()
+  const snapshot = useAppSnapshot()
   const queries = useGameQueries()
   const [pendingAction, setPendingAction] = useState<PendingAction>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
-  const viewState = getSeedPlantingViewState(queries.gameState, queries.growth)
+  const [showGrowthHint, setShowGrowthHint] = useState(false)
+  const observedAt = snapshot.status === 'ready' ? snapshot.observedAt : 0
+  const viewState = getSeedPlantingViewState(queries.gameState, queries.growth, observedAt)
 
   useEffect(() => {
     let isActive = true
@@ -208,6 +246,18 @@ export function S03SeedPlantingPage() {
       isActive = false
     }
   }, [actions])
+
+  useEffect(() => {
+    if (viewState.status !== 'growing') {
+      return
+    }
+
+    const refreshTimer = window.setInterval(() => {
+      void actions.refreshGrowth()
+    }, 60 * 1_000)
+
+    return () => window.clearInterval(refreshTimer)
+  }, [actions, viewState.status])
 
   async function runAction(
     pending: Exclude<PendingAction, null>,
@@ -233,16 +283,20 @@ export function S03SeedPlantingPage() {
           aria-label="홈으로 돌아가기"
           onClick={() => navigation.navigate('backHome')}
         >
-          <span aria-hidden="true">‹</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="m15 5-7 7 7 7" />
+          </svg>
         </button>
         <h1>씨앗 심기</h1>
       </header>
       <SeedPlantingContent
         viewState={viewState}
         pendingAction={pendingAction}
+        showGrowthHint={showGrowthHint}
         onPlant={() => void runAction('plant', actions.plantSeed)}
         onEquip={() => void runAction('equip', actions.finishGrowthWithEquipment)}
         onStore={() => void runAction('store', actions.finishGrowthToStorage)}
+        onToggleGrowthHint={() => setShowGrowthHint((isVisible) => !isVisible)}
       />
       <p className="s03-error" role="status" aria-live="polite">
         {errorMessage}

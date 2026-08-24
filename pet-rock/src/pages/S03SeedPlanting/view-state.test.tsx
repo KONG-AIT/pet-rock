@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { createInitialGameState, getGrowthView, plantSeed, completePlantGrowth } from '../../domain'
 import type { GameState, Result } from '../../domain'
 import { SeedPlantingContent } from './index'
-import { getSeedPlantingViewState } from './view-state'
+import { formatRemainingTime, getSeedPlantingViewState } from './view-state'
 
 const ADOPTED_AT = 1_000
 const SIX_HOURS = 6 * 60 * 60 * 1_000
@@ -23,9 +23,11 @@ function initialState(): GameState {
 
 const callbacks = {
   pendingAction: null,
+  showGrowthHint: false,
   onPlant: vi.fn(),
   onEquip: vi.fn(),
   onStore: vi.fn(),
+  onToggleGrowthHint: vi.fn(),
 } as const
 
 describe('S03 seed planting view states', () => {
@@ -48,15 +50,40 @@ describe('S03 seed planting view states', () => {
     const viewState = getSeedPlantingViewState(
       planted,
       getGrowthView(planted, ADOPTED_AT + elapsed),
+      ADOPTED_AT + elapsed,
     )
     const html = renderToStaticMarkup(<SeedPlantingContent viewState={viewState} {...callbacks} />)
 
     expect(planted.seeds.basic).toBe(2)
     expect(viewState).toMatchObject({ status: 'growing', stage, seedCount: 2 })
     expect(html).toContain(copy)
+    expect(html).toContain('남은 시간')
     expect(html).not.toContain('식물 2')
     expect(html).not.toContain('plant-02')
     expect(html).not.toContain('씨앗 심기</button>')
+  })
+
+  it('formats the remaining growth time without a progress gauge', () => {
+    expect(formatRemainingTime(6 * 60 * 60 * 1_000)).toBe('6시간')
+    expect(formatRemainingTime((2 * 60 + 45) * 60 * 1_000)).toBe('2시간 45분')
+    expect(formatRemainingTime(30 * 1_000)).toBe('1분')
+    expect(formatRemainingTime(0)).toBe('곧 다 자라요')
+  })
+
+  it('shows a non-revealing explanation when the mystery button is active', () => {
+    const planted = unwrap(plantSeed(initialState(), ADOPTED_AT, () => 'plant-02'))
+    const viewState = getSeedPlantingViewState(
+      planted,
+      getGrowthView(planted, ADOPTED_AT),
+      ADOPTED_AT,
+    )
+    const html = renderToStaticMarkup(
+      <SeedPlantingContent {...callbacks} viewState={viewState} showGrowthHint />,
+    )
+
+    expect(html).toContain('aria-expanded="true"')
+    expect(html).toContain('다 자라기 전까지 어떤 식물인지는 비밀이에요.')
+    expect(html).not.toContain('식물 2')
   })
 
   it('reveals a completed plant and offers equip and store actions at six hours', () => {
