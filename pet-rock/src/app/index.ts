@@ -1,6 +1,7 @@
 export { AppProvider } from './AppProvider'
 export { AppRouter } from './AppRouter'
 export type { AppScreens } from './AppRouter'
+export { useTransientHistoryEntry } from './history-entry'
 export { useAppNavigation, useAppSnapshot, useGameActions, useGameQueries } from './hooks'
 export {
   APP_ROUTES,
