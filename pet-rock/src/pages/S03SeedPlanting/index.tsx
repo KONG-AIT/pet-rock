@@ -88,21 +88,17 @@ function CompletedPlant({ plantId }: { plantId: PlantId }) {
 type SeedPlantingContentProps = Readonly<{
   viewState: SeedPlantingViewState
   pendingAction: PendingAction
-  showGrowthHint: boolean
   onPlant(): void
   onEquip(): void
   onStore(): void
-  onToggleGrowthHint(): void
 }>
 
 export function SeedPlantingContent({
   viewState,
   pendingAction,
-  showGrowthHint,
   onPlant,
   onEquip,
   onStore,
-  onToggleGrowthHint,
 }: SeedPlantingContentProps) {
   if (viewState.status === 'unavailable') {
     return (
@@ -157,22 +153,6 @@ export function SeedPlantingContent({
           <p className="s03-state__description">어떤 식물이 될까요?</p>
         </div>
         <div className="s03-visual">
-          <button
-            className="s03-mystery"
-            type="button"
-            aria-label="성장 안내 보기"
-            aria-expanded={showGrowthHint}
-            onClick={onToggleGrowthHint}
-          >
-            ?
-          </button>
-          {showGrowthHint ? (
-            <p className="s03-mystery-bubble" role="status">
-              다 자라기 전까지
-              <br />
-              어떤 식물인지는 비밀이에요.
-            </p>
-          ) : null}
           <PotIllustration stage={viewState.stage} />
         </div>
         <div className="s03-growth-details">
@@ -234,7 +214,6 @@ export function S03SeedPlantingPage() {
   const queries = useGameQueries()
   const [pendingAction, setPendingAction] = useState<PendingAction>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
-  const [showGrowthHint, setShowGrowthHint] = useState(false)
   const observedAt = snapshot.status === 'ready' ? snapshot.observedAt : 0
   const viewState = getSeedPlantingViewState(queries.gameState, queries.growth, observedAt)
 
@@ -297,11 +276,9 @@ export function S03SeedPlantingPage() {
       <SeedPlantingContent
         viewState={viewState}
         pendingAction={pendingAction}
-        showGrowthHint={showGrowthHint}
         onPlant={() => void runAction('plant', actions.plantSeed)}
         onEquip={() => void runAction('equip', actions.finishGrowthWithEquipment)}
         onStore={() => void runAction('store', actions.finishGrowthToStorage)}
-        onToggleGrowthHint={() => setShowGrowthHint((isVisible) => !isVisible)}
       />
       <p className="s03-error" role="status" aria-live="polite">
         {errorMessage}

@@ -23,11 +23,9 @@ function initialState(): GameState {
 
 const callbacks = {
   pendingAction: null,
-  showGrowthHint: false,
   onPlant: vi.fn(),
   onEquip: vi.fn(),
   onStore: vi.fn(),
-  onToggleGrowthHint: vi.fn(),
 } as const
 
 describe('S03 seed planting view states', () => {
@@ -68,24 +66,6 @@ describe('S03 seed planting view states', () => {
     expect(formatRemainingTime((2 * 60 + 45) * 60 * 1_000)).toBe('2시간 45분')
     expect(formatRemainingTime(30 * 1_000)).toBe('1분')
     expect(formatRemainingTime(0)).toBe('곧 다 자라요')
-  })
-
-  it('shows a non-revealing explanation when the mystery button is active', () => {
-    const planted = unwrap(plantSeed(initialState(), ADOPTED_AT, () => 'plant-02'))
-    const viewState = getSeedPlantingViewState(
-      planted,
-      getGrowthView(planted, ADOPTED_AT),
-      ADOPTED_AT,
-    )
-    const html = renderToStaticMarkup(
-      <SeedPlantingContent {...callbacks} viewState={viewState} showGrowthHint />,
-    )
-
-    expect(html).toContain('aria-expanded="true"')
-    expect(html).toContain('s03-mystery-bubble')
-    expect(html).toContain('다 자라기 전까지')
-    expect(html).toContain('어떤 식물인지는 비밀이에요.')
-    expect(html).not.toContain('식물 2')
   })
 
   it('reveals a completed plant and offers equip and store actions at six hours', () => {

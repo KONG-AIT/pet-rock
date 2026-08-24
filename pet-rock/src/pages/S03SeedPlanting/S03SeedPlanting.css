@@ -70,7 +70,7 @@
 .s03-state {
   flex: 1;
   min-height: 620px;
-  padding: 54px 28px 30px;
+  padding: clamp(88px, 11svh, 118px) 28px 30px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -241,78 +241,6 @@
   animation: s03-sprout-sway 4s ease-in-out infinite;
 }
 
-.s03-mystery {
-  position: absolute;
-  z-index: 3;
-  top: 19px;
-  left: calc(50% + 73px);
-  width: 35px;
-  height: 35px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  color: #817d72;
-  background: rgba(255, 255, 255, 0.8);
-  box-shadow: 0 5px 18px rgba(67, 58, 44, 0.1);
-  font-size: 19px;
-  font-weight: 750;
-  border: 0;
-  font-family: inherit;
-  cursor: pointer;
-  transition: transform 140ms ease, background-color 140ms ease;
-}
-
-.s03-mystery:hover,
-.s03-mystery[aria-expanded='true'] {
-  color: #fff;
-  background: var(--s03-green);
-}
-
-.s03-mystery:active {
-  transform: scale(0.94);
-}
-
-.s03-mystery:focus-visible {
-  outline: 3px solid rgba(85, 119, 70, 0.35);
-  outline-offset: 3px;
-}
-
-.s03-mystery-bubble {
-  position: absolute;
-  z-index: 4;
-  top: 64px;
-  right: 7px;
-  width: 174px;
-  box-sizing: border-box;
-  padding: 12px 14px;
-  border: 1px solid rgba(55, 83, 45, 0.18);
-  border-radius: 14px;
-  color: var(--s03-ink);
-  background: #fffef9;
-  box-shadow: 0 9px 24px rgba(55, 49, 39, 0.14);
-  font-size: 13px;
-  line-height: 1.45;
-  text-align: left;
-  animation: s03-bubble-in 160ms ease-out;
-}
-
-.s03-mystery-bubble::before,
-.s03-mystery-bubble::after {
-  content: '';
-  position: absolute;
-  top: -8px;
-  right: 73px;
-  width: 14px;
-  height: 14px;
-  transform: rotate(45deg);
-  background: #fffef9;
-}
-
-.s03-mystery-bubble::before {
-  border-top: 1px solid rgba(55, 83, 45, 0.18);
-  border-left: 1px solid rgba(55, 83, 45, 0.18);
-}
-
 .s03-growth-details {
   min-height: 82px;
   margin-top: -4px;
@@ -399,14 +327,6 @@
 .s03-empty-note {
   color: var(--s03-muted);
   font-size: 13px;
-}
-
-.s03-state--growing {
-  padding-top: 72px;
-}
-
-.s03-state--completed {
-  padding-top: 62px;
 }
 
 .s03-state--completed .s03-copy {
@@ -508,17 +428,6 @@
   50% { transform: rotate(1.5deg); }
 }
 
-@keyframes s03-bubble-in {
-  from {
-    opacity: 0;
-    transform: translateY(-4px) scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
 @media (max-width: 480px) {
   .s03-state {
     min-height: calc(100svh - 100px);
@@ -534,15 +443,21 @@
   }
 }
 
+@media (max-height: 760px) {
+  .s03-state {
+    padding-top: 48px;
+  }
+
+  .s03-state--growing {
+    padding-top: 56px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .s03-visual--empty > .s03-seed,
   .s03-sprout--planted,
   .s03-sprout--growing,
   .s03-completed-plant__growth {
-    animation: none;
-  }
-
-  .s03-mystery-bubble {
     animation: none;
   }
 }
