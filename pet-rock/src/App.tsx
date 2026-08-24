@@ -1,29 +1,30 @@
-import { useState } from "react";
-// create-ait-app:sample-imports:start
-import { InAppPurchasePage } from "./pages/InAppPurchasePage";
-import { InAppAdsPage } from "./pages/InAppAdsPage";
-// create-ait-app:sample-imports:end
+import {
+  AppProvider,
+  AppRouter,
+  createRandomPlantSelector,
+  type AppScreens,
+} from './app/index'
+import { RockSelectionScreen } from './screens/s01-rock-selection'
+import { HomeScreen } from './screens/s02-home'
+import { PlantingScreen } from './screens/s03-planting'
+import { PlantStorageScreen } from './screens/s04-plant-storage'
+import { createAppsInTossGameStorage } from './storage'
 
-function App() {
-  const [page, setPage] = useState<string | null>(null);
-
-  // create-ait-app:sample-routes:start
-  if (page === "iap") return <InAppPurchasePage onBack={() => setPage(null)} />;
-  if (page === "iaa") return <InAppAdsPage onBack={() => setPage(null)} />;
-  // create-ait-app:sample-routes:end
-
-  return (
-    <main>
-      <h1>Apps in Toss</h1>
-      <p>원하는 기능을 샌드박스 앱이나 토스 앱에서 확인해 보세요.</p>
-      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        {/* create-ait-app:sample-buttons:start */}
-        <button type="button" onClick={() => setPage("iap")}>인앱 결제 테스트하기</button>
-        <button type="button" onClick={() => setPage("iaa")}>인앱 광고 테스트하기</button>
-        {/* create-ait-app:sample-buttons:end */}
-      </div>
-    </main>
-  );
+const storage = createAppsInTossGameStorage()
+const selectPlant = createRandomPlantSelector()
+const screens: AppScreens = {
+  RockSelection: RockSelectionScreen,
+  Home: HomeScreen,
+  Planting: PlantingScreen,
+  PlantStorage: PlantStorageScreen,
 }
 
-export default App;
+function App() {
+  return (
+    <AppProvider storage={storage} selectPlant={selectPlant}>
+      <AppRouter screens={screens} />
+    </AppProvider>
+  )
+}
+
+export default App
