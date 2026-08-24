@@ -82,11 +82,12 @@ export function createAppStore({ storage, now, selectPlant }: CreateAppStoreOpti
   }
 
   function enqueue(operation: () => Promise<AppActionResult>): Promise<AppActionResult> {
-    return new Promise((resolve) => {
-      mutationQueue = mutationQueue.then(async () => {
-        resolve(await operation())
-      })
-    })
+    const result = mutationQueue.then(operation)
+    mutationQueue = result.then(
+      () => undefined,
+      () => undefined,
+    )
+    return result
   }
 
   async function synchronizeGrowth(
