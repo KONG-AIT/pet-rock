@@ -1,0 +1,95 @@
+.app-router {
+  position: relative;
+  display: grid;
+  width: 100%;
+  min-height: 100svh;
+  flex: 1;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.app-route-view {
+  grid-area: 1 / 1;
+  width: 100%;
+  min-width: 0;
+  min-height: 100svh;
+  background: inherit;
+  outline: none;
+}
+
+.app-router[data-transitioning='true'] {
+  pointer-events: none;
+  user-select: none;
+}
+
+.app-route-view--departing {
+  z-index: 1;
+}
+
+.app-route-view--arriving {
+  z-index: 2;
+}
+
+.app-route-view button:not(:disabled) {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.app-route-view button:not(:disabled):active {
+  filter: brightness(0.94);
+}
+
+.app-router__status {
+  display: grid;
+  min-height: 100svh;
+  margin: 0;
+  padding: max(24px, env(safe-area-inset-top)) 20px
+    max(24px, env(safe-area-inset-bottom));
+  place-items: center;
+  box-sizing: border-box;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .app-route-view--arriving[data-direction='forward'] {
+    animation: app-route-forward-in 210ms cubic-bezier(0.22, 0.72, 0.24, 1) both;
+  }
+
+  .app-route-view--departing[data-direction='forward'] {
+    animation: app-route-forward-out 210ms cubic-bezier(0.22, 0.72, 0.24, 1) both;
+  }
+
+  .app-route-view--arriving[data-direction='back'] {
+    animation: app-route-back-in 210ms cubic-bezier(0.22, 0.72, 0.24, 1) both;
+  }
+
+  .app-route-view--departing[data-direction='back'] {
+    animation: app-route-back-out 210ms cubic-bezier(0.22, 0.72, 0.24, 1) both;
+  }
+}
+
+@keyframes app-route-forward-in {
+  from { opacity: 0; transform: translate3d(18px, 0, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@keyframes app-route-forward-out {
+  from { opacity: 1; transform: translate3d(0, 0, 0); }
+  to { opacity: 0; transform: translate3d(-10px, 0, 0); }
+}
+
+@keyframes app-route-back-in {
+  from { opacity: 0; transform: translate3d(-14px, 0, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@keyframes app-route-back-out {
+  from { opacity: 1; transform: translate3d(0, 0, 0); }
+  to { opacity: 0; transform: translate3d(18px, 0, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-route-view,
+  .app-route-view button {
+    animation: none !important;
+    transition: none !important;
+  }
+}

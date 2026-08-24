@@ -168,7 +168,12 @@ export function PlantStorageView({
       </div>
 
       {activeTab === 'plants' ? (
-        <div id="plants-panel" role="tabpanel" aria-labelledby="plants-tab">
+        <div
+          id="plants-panel"
+          key="plants"
+          role="tabpanel"
+          aria-labelledby="plants-tab"
+        >
           {model.completedPlantCount === 0 ? (
             <EmptyState kind="plants" onOpenPlanting={onOpenPlanting} />
           ) : (
@@ -256,7 +261,12 @@ export function PlantStorageView({
           )}
         </div>
       ) : (
-        <div id="seeds-panel" role="tabpanel" aria-labelledby="seeds-tab">
+        <div
+          id="seeds-panel"
+          key="seeds"
+          role="tabpanel"
+          aria-labelledby="seeds-tab"
+        >
           {model.seedCount === 0 ? (
             <EmptyState kind="seeds" onOpenPlanting={onOpenPlanting} />
           ) : (
