@@ -167,6 +167,35 @@ describe('app initialization', () => {
 })
 
 describe('game actions', () => {
+  it('continues processing mutations after an unexpected action failure', async () => {
+    const storage = new RecordingStorage(initialState())
+    let shouldThrow = true
+    const app = createAppStore({
+      storage,
+      now: () => ADOPTED_AT,
+      selectPlant: () => {
+        if (shouldThrow) {
+          throw new Error('Unexpected selector failure')
+        }
+
+        return 'plant-01'
+      },
+    })
+    await app.initialize()
+
+    await expect(app.actions.plantSeed()).rejects.toThrow('Unexpected selector failure')
+
+    shouldThrow = false
+    await expect(app.actions.plantSeed()).resolves.toEqual({
+      ok: true,
+      value: undefined,
+    })
+    expect(app.getSnapshot().gameState?.plantGrowth).toMatchObject({
+      status: 'growing',
+      resultPlantId: 'plant-01',
+    })
+  })
+
   it('reflects a new game only after it has been saved', async () => {
     const storage = new RecordingStorage(null)
     const app = store(storage)
