@@ -55,6 +55,7 @@ describe('S03 seed planting view states', () => {
     expect(planted.seeds.basic).toBe(2)
     expect(viewState).toMatchObject({ status: 'growing', stage, seedCount: 2 })
     expect(html).toContain(copy)
+    expect(html).toContain('보유 기본 씨앗 2개')
     expect(html).toContain('남은 시간')
     expect(html).not.toContain('식물 2')
     expect(html).not.toContain('plant-02')

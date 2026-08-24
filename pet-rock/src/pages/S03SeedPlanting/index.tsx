@@ -26,6 +26,16 @@ function SeedIcon() {
   )
 }
 
+function SeedCount({ count }: { count: number }) {
+  return (
+    <div className="s03-seed-count" aria-label={`보유 기본 씨앗 ${count}개`}>
+      <SeedIcon />
+      <span>기본 씨앗</span>
+      <strong>×{count}</strong>
+    </div>
+  )
+}
+
 function PotIllustration({ stage }: { stage: 'empty' | 'planted' | 'growing' }) {
   return (
     <svg className={`s03-pot s03-pot--${stage}`} viewBox="0 0 280 300" aria-hidden="true">
@@ -112,11 +122,7 @@ export function SeedPlantingContent({
   if (viewState.status === 'empty') {
     return (
       <section className="s03-state s03-state--empty">
-        <div className="s03-seed-count" aria-label={`보유 기본 씨앗 ${viewState.seedCount}개`}>
-          <SeedIcon />
-          <span>기본 씨앗</span>
-          <strong>×{viewState.seedCount}</strong>
-        </div>
+        <SeedCount count={viewState.seedCount} />
         <div className="s03-copy">
           <p className="s03-state__title">씨앗을 화분에 심어볼까요?</p>
           <p className="s03-state__description">어떤 식물이 될지는 다 자란 뒤 알 수 있어요.</p>
@@ -146,6 +152,7 @@ export function SeedPlantingContent({
 
     return (
       <section className="s03-state s03-state--growing">
+        <SeedCount count={viewState.seedCount} />
         <div className="s03-copy">
           <p className="s03-state__title">
             {isPlanted ? '씨앗이 자리를 잡고 있어요.' : '조금씩 자라고 있어요.'}
