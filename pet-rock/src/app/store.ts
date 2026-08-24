@@ -13,6 +13,7 @@ import type { GameStorage } from '../storage'
 import { APP_ROUTES, getNavigationDestination, type NavigationCommand } from './routes'
 import type {
   AdoptRockInput,
+  AppError,
   AppActionError,
   AppActionResult,
   AppNavigation,
@@ -23,6 +24,9 @@ import type {
 type Clock = () => number
 type Listener = () => void
 type StateTransition = (state: GameState) => Result<GameState>
+type GrowthSynchronizationResult =
+  | Readonly<{ ok: true; state: GameState }>
+  | Readonly<{ ok: false; error: AppError }>
 
 export interface AppStore {
   getSnapshot(): AppSnapshot
@@ -83,6 +87,33 @@ export function createAppStore({ storage, now, selectPlant }: CreateAppStoreOpti
         resolve(await operation())
       })
     })
+  }
+
+  async function synchronizeGrowth(
+    state: GameState,
+    observedAt: number,
+  ): Promise<GrowthSynchronizationResult> {
+    const completed = completePlantGrowth(state, observedAt)
+
+    if (!completed.ok) {
+      if (
+        completed.error.code === 'growth_not_complete' ||
+        completed.error.code === 'no_growth' ||
+        completed.error.code === 'growth_already_complete'
+      ) {
+        return { ok: true, state }
+      }
+
+      return { ok: false, error: { source: 'domain', error: completed.error } }
+    }
+
+    const saved = await storage.save(completed.value)
+
+    if (!saved.ok) {
+      return { ok: false, error: { source: 'storage', error: saved.error } }
+    }
+
+    return { ok: true, state: completed.value }
   }
 
   async function saveTransition(
@@ -165,41 +196,22 @@ export function createAppStore({ storage, now, selectPlant }: CreateAppStoreOpti
         return
       }
 
-      let currentState = loaded.value
-      const growth = currentState.plantGrowth
       const observedAt = now()
+      const synchronized = await synchronizeGrowth(loaded.value, observedAt)
 
-      if (growth?.status === 'growing') {
-        const completed = completePlantGrowth(currentState, observedAt)
-
-        if (completed.ok) {
-          const saved = await storage.save(completed.value)
-
-          if (!saved.ok) {
-            publish({
-              status: 'error',
-              gameState: null,
-              route: null,
-              error: { source: 'storage', error: saved.error },
-            })
-            return
-          }
-
-          currentState = completed.value
-        } else if (completed.error.code !== 'growth_not_complete') {
-          publish({
-            status: 'error',
-            gameState: null,
-            route: null,
-            error: { source: 'domain', error: completed.error },
-          })
-          return
-        }
+      if (!synchronized.ok) {
+        publish({
+          status: 'error',
+          gameState: null,
+          route: null,
+          error: synchronized.error,
+        })
+        return
       }
 
       publish({
         status: 'ready',
-        gameState: currentState,
+        gameState: synchronized.state,
         route: APP_ROUTES.home,
         observedAt,
       })
@@ -261,28 +273,17 @@ export function createAppStore({ storage, now, selectPlant }: CreateAppStoreOpti
         }
 
         const observedAt = now()
-        const completed = completePlantGrowth(readyGame.state, observedAt)
+        const synchronized = await synchronizeGrowth(readyGame.state, observedAt)
 
-        if (!completed.ok) {
-          if (
-            completed.error.code === 'growth_not_complete' ||
-            completed.error.code === 'no_growth' ||
-            completed.error.code === 'growth_already_complete'
-          ) {
-            publish({ ...snapshot, observedAt })
-            return actionSuccess()
-          }
-
-          return actionFailure({ source: 'domain', error: completed.error })
+        if (!synchronized.ok) {
+          return actionFailure(synchronized.error)
         }
 
-        const saved = await storage.save(completed.value)
-
-        if (!saved.ok) {
-          return actionFailure({ source: 'storage', error: saved.error })
+        if (snapshot.status !== 'ready') {
+          return actionFailure({ source: 'app', code: 'not_ready' })
         }
 
-        publish({ ...snapshot, gameState: completed.value, observedAt })
+        publish({ ...snapshot, gameState: synchronized.state, observedAt })
         return actionSuccess()
       })
     },

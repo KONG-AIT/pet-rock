@@ -230,6 +230,61 @@ describe('game actions', () => {
     expect(storage.saves).toHaveLength(0)
   })
 
+  it('persists completed growth when refreshing the elapsed growth view', async () => {
+    const planted = unwrap(plantSeed(initialState(), ADOPTED_AT, () => 'plant-03'))
+    const storage = new RecordingStorage(planted)
+    let currentTime = ADOPTED_AT
+    const app = createAppStore({
+      storage,
+      now: () => currentTime,
+      selectPlant: () => 'plant-01',
+    })
+    await app.initialize()
+    currentTime = ADOPTED_AT + GROWTH_COMPLETE_MS
+
+    expect(await app.actions.refreshGrowth()).toEqual({ ok: true, value: undefined })
+
+    const snapshot = app.getSnapshot()
+    expect(snapshot).toMatchObject({
+      status: 'ready',
+      gameState: {
+        plantGrowth: {
+          status: 'completed',
+          completedAt: ADOPTED_AT + GROWTH_COMPLETE_MS,
+          plantId: 'plant-03',
+        },
+      },
+      observedAt: currentTime,
+    })
+    expect(storage.state).toEqual(
+      snapshot.status === 'ready' ? snapshot.gameState : null,
+    )
+    expect(storage.saves).toHaveLength(1)
+  })
+
+  it('keeps the current state when refreshed growth cannot be saved', async () => {
+    const planted = unwrap(plantSeed(initialState(), ADOPTED_AT, () => 'plant-02'))
+    const storage = new RecordingStorage(planted)
+    let currentTime = ADOPTED_AT
+    const app = createAppStore({
+      storage,
+      now: () => currentTime,
+      selectPlant: () => 'plant-01',
+    })
+    await app.initialize()
+    const before = app.getSnapshot()
+    currentTime = ADOPTED_AT + GROWTH_COMPLETE_MS
+    storage.saveError = { code: 'write_failed' }
+
+    expect(await app.actions.refreshGrowth()).toEqual({
+      ok: false,
+      error: { source: 'storage', error: { code: 'write_failed' } },
+    })
+    expect(app.getSnapshot()).toBe(before)
+    expect(storage.state).toBe(planted)
+    expect(storage.saves).toHaveLength(0)
+  })
+
   it('collects and equips a completed plant before returning home', async () => {
     const planted = unwrap(plantSeed(initialState(), ADOPTED_AT, () => 'plant-01'))
     const storage = new RecordingStorage(planted)
