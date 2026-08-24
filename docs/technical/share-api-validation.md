@@ -22,20 +22,26 @@
    아니며 토스 WebView 지원 여부도 공식 문서에 보장되어 있지 않으므로, iOS/Android
    실기기에서 capability를 통과한 경우에만 사용할 수 있다.
 
-P09의 권장 방향은 **공식 SDK의 텍스트/링크 공유를 기본 경로로 두고, 이미지 파일 공유는
-실기기 capability 검증을 마친 뒤에만 progressive enhancement로 추가하는 것**이다.
-현재 UX를 이미지 첨부가 반드시 필요한 계약으로 유지하려면 아래의 사람 판단 항목을 먼저
-결정해야 한다.
+P09의 확정 방향은 **공식 SDK의 텍스트/링크 공유를 이미지 capability와 독립적인 기본
+경로로 두고, 이미지 파일 공유는 실기기 capability가 확인된 환경에서만 progressive
+enhancement로 추가하는 것**이다. 이미지 파일 공유는 현재 구현의 필수 요구사항이 아니며,
+이미지 capability가 없어도 기본 공유 기능은 사용할 수 있어야 한다.
 
 ## 제품/UX 요구사항
 
 관련 제품 문서는 공유를 다음과 같이 제한한다.
 
 - 서버에 다른 사용자의 돌 상태를 저장하거나 조회하지 않는다.
-- 현재 돌을 이미지나 카드 형태로 외부에 공유한다.
+- 현재 돌의 모습을 외부에 공유한다.
+- 기본적으로 텍스트와 링크를 OS Share Sheet로 전달한다.
+- 실행 환경이 이미지 파일 공유를 지원하면 현재 돌, 이름, 장착 식물을 표현한 이미지를
+  함께 전달할 수 있다.
+- 이미지 파일은 선택적인 enhancement이며 기본 공유 기능의 완료 조건이 아니다.
 - 별도의 공유 Preview 화면을 만들지 않는다.
-- 앱 화면 전체 캡처보다 돌, 현재 머리 위 식물, 돌 이름, 작은 브랜딩이 중심인 이미지를 만든다.
-- 생성한 결과를 OS Share Sheet로 보낸 뒤 홈으로 돌아온다.
+- 선택적 이미지는 앱 화면 전체 캡처보다 돌, 현재 머리 위 식물, 돌 이름, 작은 브랜딩을
+  중심으로 만든다.
+- 공유 완료, 취소, 실패 이후에도 현재 게임 상태와 홈 상태를 유지한다.
+- 공유 결과에 게임 보상이나 상태 변경을 연결하지 않는다.
 
 이 검증은 위 경로의 기술 가능성만 다루며 공유 화면, 보상, 유입, 서버 저장 기능을 추가하지
 않는다.
@@ -216,8 +222,9 @@ P09가 Apps in Toss 전용 기능으로 구현된다면 일반 브라우저에�
 2. 파일 공유가 없거나 거부되면 `Share.sendMessage`로 텍스트/링크를 공유한다.
 3. native bridge가 없는 일반 브라우저에서는 `navigator.share({ text, url })`를 사용할 수
    있을 때만 사용한다.
-4. `navigator.share`도 없을 때 다운로드, 클립보드 복사, 공유 버튼 숨김 중 무엇을 제공할지는
-   제품 판단으로 남긴다. Issue #5 범위에서는 새 fallback UX를 추가하지 않는다.
+4. `navigator.share`도 없을 때 별도의 다운로드, 클립보드 복사, 공유 버튼 숨김 UX를 새로
+   만들지 않는다. Apps in Toss 공식 SDK 경로를 사용할 수 없는 일반 브라우저의 fallback은
+   P09 범위에서 임의로 확장하지 않는다.
 
 SDK 호출 가능 여부를 단순히 `navigator.share`로 판정해서는 안 된다. Toss App의
 `Share.sendMessage`는 브라우저 Web Share가 아니라 native bridge API다. 브라우저 fallback은
@@ -247,41 +254,45 @@ SDK 호출 가능 여부를 단순히 `navigator.share`로 판정해서는 안 �
 공유 완료를 게임 보상이나 상태 변경 조건으로 사용하지 않는다. Share API는 수신 앱에서의
 최종 전송 완료를 보장하지 않는다.
 
-## P09 권장 구현 경로
+## 확정된 공유 정책
 
-1. 공유 카드 렌더러는 제품 UI와 분리해 현재 돌, 장착 식물, 돌 이름, 작은 브랜딩만 Canvas에
-   그린다.
-2. Canvas 결과는 PNG `Blob`과 `File`로 만든다. Base64는 `File.saveBase64` fallback이 실제로
-   채택될 때만 생성해 메모리 복사를 줄인다.
-3. 실기기 spike에서 네 환경의 `navigator.canShare({ files: [pngFile] })`와 실제 PNG 첨부를
-   확인한다.
-4. 네 환경에서 요구하는 최소 지원 범위가 충족될 때만 Web Share 파일 경로를 활성화한다.
-5. 그 외에는 `Share.createLink` + `Share.sendMessage` 텍스트/링크 경로를 사용한다.
-6. 브라우저와 native bridge 분기는 작은 share adapter에 모으고, UI는 `shared`, `cancelled`,
-   `unavailable`, `failed` 정도의 결과만 처리한다. SDK가 제공하지 않는 세부 성공 상태를
-   만들어내지 않는다.
+- 이미지 파일 공유는 현재 구현의 필수 요구사항이 아니다.
+- `Share.createLink`와 `Share.sendMessage`를 사용하는 텍스트/링크 공유가 기본 경로다.
+- 파일 Web Share는 Toss App과 Sandbox App 실기기에서 capability가 확인된 환경에서만
+  progressive enhancement로 제공한다.
+- 이미지 capability가 없거나 runtime 확인에 실패해도 공식 SDK 텍스트/링크 공유는 사용할
+  수 있어야 한다.
+- 동적 이미지 공유를 위한 별도 서버나 CDN을 도입하지 않는다.
+- `File.saveBase64`로 이미지를 저장한 뒤 사용자가 직접 공유하게 하는 흐름은 포함하지 않는다.
+- 공유 결과에 게임 보상이나 상태 변경을 연결하지 않는다.
+- 공유 완료, 취소, 실패 이후에도 현재 게임 상태와 홈 상태를 유지한다.
 
-현재 증거만으로 P09에 이미지 파일 첨부를 확정 구현하는 것은 추천하지 않는다. 먼저 실기기
-spike 결과를 얻거나, 제품 요구를 “현재 돌 이미지 첨부”에서 “현재 돌을 설명하는 링크/OG
-카드 공유”까지 허용할지 결정해야 한다.
+## P09 구현 계약
 
-## 사람의 판단이 필요한 사항
+1. 공유 UI는 Apps in Toss SDK나 Web Share API의 세부 구현을 직접 알지 않는다.
+2. SDK, Web Share, runtime capability 판정은 별도 share adapter 또는 service에 격리한다.
+3. adapter는 이미지 capability와 독립적으로 `Share.createLink` + `Share.sendMessage`
+   텍스트/링크 기본 경로를 제공한다.
+4. 파일 Web Share 경로는 실기기 capability가 확인된 환경에서만 후보가 되며, 실행할 때마다
+   `navigator.share`와 `navigator.canShare({ files })`를 runtime capability로 확인한다.
+5. 선택적 이미지 경로를 제공할 때만 현재 돌, 장착 식물, 돌 이름, 작은 브랜딩을 Canvas에
+   그리고 PNG `Blob`과 `File`로 변환한다. Base64 저장 경로는 만들지 않는다.
+6. UI가 처리하는 결과 상태는 다음 네 가지로 제한한다.
 
-1. 파일 Web Share가 일부 OS/앱 버전에서만 지원될 때 이미지 공유를 progressive
-   enhancement로 허용할지, 모든 플랫폼에서 동일한 텍스트/링크 공유로 제한할지.
-2. 현재 돌의 동적 이미지 첨부가 필수인지, 원격 OG 이미지가 있는 링크 공유도 UX 계약을
-   충족하는지.
-3. 동적 OG가 필요할 경우 서버/CDN 업로드를 “서버 없이 우선” 원칙의 예외로 허용할지.
-4. 일반 브라우저에 Share API가 없을 때 다운로드, 클립보드 복사, 버튼 숨김 중 어느 UX를
-   선택할지.
-5. `File.saveBase64`를 별도의 “이미지 저장” 기능으로 제공할지. 이는 공유 기능과 다른 제품
-   기능이므로 별도 Issue가 필요하다.
+   - `shared`
+   - `cancelled`
+   - `unavailable`
+   - `failed`
 
-## 검증하지 못한 항목
+7. SDK가 제공하지 않는 수신 앱 선택, 실제 전송 완료 같은 세부 성공 상태를 임의로 만들지
+   않는다.
+8. 어떤 결과 상태에서도 게임 보상이나 도메인 상태를 변경하지 않으며 홈 상태를 유지한다.
 
-이 작업 환경에는 Toss App과 Sandbox App iOS/Android 실기기가 연결되어 있지 않아 Web
-Share 파일 첨부의 실제 동작은 확인하지 못했다. 이 항목은 SDK 타입이나 브라우저 mock으로
-대체할 수 없으며, 위 실기기 matrix를 P09 착수 전 QA해야 한다.
+## P09 전에 남아 있는 기술 검증
+
+Toss App과 Sandbox App의 iOS/Android 실기기에서 Web Share 파일 capability와 실제 PNG
+첨부를 확인하는 작업만 남아 있다. 이 검증은 선택적 이미지 enhancement의 활성화 여부만
+결정하며, 공식 SDK 텍스트/링크 기본 경로를 구현하는 P09의 착수를 막지 않는다.
 
 ## 근거
 
@@ -292,4 +303,3 @@ Share 파일 첨부의 실제 동작은 확인하지 못했다. 이 항목은 SD
 - [Apps in Toss 공식 예제](https://github.com/toss/apps-in-toss-examples)
 - [W3C Web Share API](https://w3c.github.io/web-share/)
 - [MDN Web Share API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Share_API)
-
