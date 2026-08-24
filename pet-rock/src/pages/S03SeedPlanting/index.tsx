@@ -166,6 +166,13 @@ export function SeedPlantingContent({
           >
             ?
           </button>
+          {showGrowthHint ? (
+            <p className="s03-mystery-bubble" role="status">
+              다 자라기 전까지
+              <br />
+              어떤 식물인지는 비밀이에요.
+            </p>
+          ) : null}
           <PotIllustration stage={viewState.stage} />
         </div>
         <div className="s03-growth-details">
@@ -178,11 +185,9 @@ export function SeedPlantingContent({
             <strong>{formatRemainingTime(viewState.remainingMs)}</strong>
           </div>
           <p className="s03-growing-note">
-            {showGrowthHint
-              ? '다 자라기 전까지 어떤 식물인지는 비밀이에요.'
-              : isPlanted
-                ? '흙 속에서 작은 변화가 시작됐어요.'
-                : '완성까지 조금만 더 기다려주세요.'}
+            {isPlanted
+              ? '흙 속에서 작은 변화가 시작됐어요.'
+              : '완성까지 조금만 더 기다려주세요.'}
           </p>
         </div>
       </section>

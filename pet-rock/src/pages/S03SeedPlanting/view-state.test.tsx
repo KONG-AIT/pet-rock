@@ -82,7 +82,9 @@ describe('S03 seed planting view states', () => {
     )
 
     expect(html).toContain('aria-expanded="true"')
-    expect(html).toContain('다 자라기 전까지 어떤 식물인지는 비밀이에요.')
+    expect(html).toContain('s03-mystery-bubble')
+    expect(html).toContain('다 자라기 전까지')
+    expect(html).toContain('어떤 식물인지는 비밀이에요.')
     expect(html).not.toContain('식물 2')
   })
 
