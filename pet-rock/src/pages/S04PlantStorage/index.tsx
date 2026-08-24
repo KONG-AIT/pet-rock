@@ -1,7 +1,8 @@
 import { useState } from 'react'
 
 import { useAppNavigation, useGameActions, useGameQueries } from '../../app/index'
-import { PLANT_CATALOG, type GameState, type PlantId, type RockId } from '../../domain'
+import { StoragePlantVisual, StorageRockVisual } from '../../components/visuals'
+import { PLANT_CATALOG, type GameState, type RockId } from '../../domain'
 import {
   createPlantStorageViewModel,
   getEquippedPlantId,
@@ -19,25 +20,6 @@ function plantName(plantId: PreviewPlantId): string {
   return PLANT_CATALOG.find((plant) => plant.id === plantId)?.displayName ?? '식물'
 }
 
-function RockVisual({ rockId }: Readonly<{ rockId: RockId }>) {
-  return (
-    <span className="storage-rock" data-rock={rockId} aria-hidden="true">
-      <span className="storage-rock__shine" />
-    </span>
-  )
-}
-
-function PlantVisual({ plantId }: Readonly<{ plantId: PlantId }>) {
-  return (
-    <span className="storage-plant" data-plant={plantId} aria-hidden="true">
-      <span className="storage-plant__stem" />
-      <span className="storage-plant__leaf storage-plant__leaf--left" />
-      <span className="storage-plant__leaf storage-plant__leaf--right" />
-      <span className="storage-plant__bloom" />
-    </span>
-  )
-}
-
 function Preview({
   rockId,
   rockName,
@@ -53,10 +35,10 @@ function Preview({
       <div className="storage-preview__scene">
         {plantId !== null && (
           <span key={plantId} className="storage-preview__plant">
-            <PlantVisual plantId={plantId} />
+            <StoragePlantVisual plantId={plantId} />
           </span>
         )}
-        <RockVisual rockId={rockId} />
+        <StorageRockVisual rockId={rockId} />
         <span className="storage-preview__shadow" aria-hidden="true" />
       </div>
       <h2>{rockName}</h2>
@@ -77,7 +59,7 @@ function EmptyState({
   return (
     <section className="storage-empty" aria-label={`${plants ? '식물' : '씨앗'} 빈 상태`}>
       <div className="storage-empty__illustration" aria-hidden="true">
-        {plants ? <RockVisual rockId="rock-01" /> : <span className="storage-seed-icon" />}
+        {plants ? <StorageRockVisual rockId="rock-01" /> : <span className="storage-seed-icon" />}
       </div>
       <h2>{plants ? '아직 보관함이 비어 있어요' : '가지고 있는 씨앗이 없어요'}</h2>
       <p>
@@ -203,7 +185,7 @@ export function PlantStorageView({
                     onClick={() => onPreviewChange(null)}
                   >
                     <span className="plant-card__visual plant-card__visual--none" aria-hidden="true">
-                      <RockVisual rockId={state.rock.id} />
+                      <StorageRockVisual rockId={state.rock.id} />
                     </span>
                     <span className="plant-card__name">없음</span>
                     {model.currentPlantId === null && (
@@ -223,7 +205,7 @@ export function PlantStorageView({
                         onClick={() => onPreviewChange(item.id)}
                       >
                         <span className="plant-card__visual">
-                          <PlantVisual plantId={item.id} />
+                          <StoragePlantVisual plantId={item.id} />
                         </span>
                         <span className="plant-card__name">{item.displayName}</span>
                         {item.equipped && <span className="plant-card__badge">현재</span>}
