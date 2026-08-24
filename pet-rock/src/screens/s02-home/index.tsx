@@ -1,6 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 
 import { useAppNavigation, useGameQueries } from '../../app/index'
+import {
+  createDefaultRockShareService,
+  shareRock,
+  type RockShareService,
+} from '../../share'
 import { HomeView } from './HomeView'
 import {
   createHomeRenderModel,
@@ -11,10 +16,12 @@ import {
 import './styles.css'
 
 export type HomeScreenProps = Readonly<{
-  onShare?: () => void
+  shareService?: RockShareService
 }>
 
-export function HomeScreen({ onShare = () => undefined }: HomeScreenProps) {
+export function HomeScreen({
+  shareService = createDefaultRockShareService(),
+}: HomeScreenProps) {
   const { gameState, growth } = useGameQueries()
   const navigation = useAppNavigation()
   const [menuOpen, setMenuOpen] = useState(false)
@@ -56,7 +63,8 @@ export function HomeScreen({ onShare = () => undefined }: HomeScreenProps) {
     return <main role="alert">돌 정보를 불러오지 못했어요.</main>
   }
 
-  const model = createHomeRenderModel(gameState, growth)
+  const currentGameState = gameState
+  const model = createHomeRenderModel(currentGameState, growth)
 
   function unwindMenuHistory() {
     if (menuHistoryEntry.current) {
@@ -86,7 +94,9 @@ export function HomeScreen({ onShare = () => undefined }: HomeScreenProps) {
   function selectMenuAction(action: HomeMenuAction) {
     unwindMenuHistory()
     setMenuOpen(nextMenuOpenState(menuOpen, 'selection'))
-    requestHomeMenuAction(action, navigation, onShare)
+    requestHomeMenuAction(action, navigation, () => {
+      void shareRock(currentGameState, shareService)
+    })
   }
 
   function touchRock() {
