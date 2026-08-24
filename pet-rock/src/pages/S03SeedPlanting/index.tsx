@@ -7,7 +7,7 @@ import {
   useGameQueries,
 } from '../../app/index'
 import type { AppActionResult } from '../../app/index'
-import type { PlantId } from '../../domain'
+import { CompletedPlantVisual } from '../../components/visuals'
 import {
   formatRemainingTime,
   getSeedPlantingViewState,
@@ -67,42 +67,6 @@ function PotIllustration({ stage }: { stage: 'empty' | 'planted' | 'growing' }) 
       <path className="s03-pot__body" d="M51 153h178l-24 108c-2 10-11 17-21 17H96c-10 0-19-7-21-17L51 153Z" />
       <path className="s03-pot__lip" d="M43 143h194v35c0 8-7 15-15 15H58c-8 0-15-7-15-15v-35Z" />
       <path className="s03-pot__shine" d="M81 195 94 253" />
-    </svg>
-  )
-}
-
-function CompletedPlant({ plantId }: { plantId: PlantId }) {
-  return (
-    <svg className={`s03-completed-plant s03-completed-plant--${plantId}`} viewBox="0 0 260 340" aria-hidden="true">
-      <ellipse className="s03-pot__shadow" cx="130" cy="315" rx="86" ry="14" />
-      <g className="s03-completed-plant__growth">
-        <path className="s03-completed-plant__stem" d="M130 190V68" />
-        {plantId === 'plant-01' ? (
-          <>
-            <path d="M129 131c-35 1-56-15-58-43 34-4 55 13 58 43Z" />
-            <path d="M131 108c31 1 50-13 54-39-30-4-51 11-54 39Z" />
-          </>
-        ) : null}
-        {plantId === 'plant-02' ? (
-          <>
-            <path d="M129 150c-29 1-46-12-48-35 28-4 46 11 48 35Z" />
-            <path d="M131 128c27 0 44-12 47-35-27-3-44 10-47 35Z" />
-            <circle cx="130" cy="63" r="31" />
-            <circle className="s03-completed-plant__center" cx="130" cy="63" r="12" />
-          </>
-        ) : null}
-        {plantId === 'plant-03' ? (
-          <>
-            <path d="M129 145c-28 1-45-12-47-35 27-3 45 10 47 35Z" />
-            <path d="M131 119c26 1 43-11 46-34-26-3-43 10-46 34Z" />
-            <path className="s03-completed-plant__crown" d="M95 79c3-30 17-49 35-49s32 19 35 49c-10 12-23 18-35 18S105 91 95 79Z" />
-          </>
-        ) : null}
-      </g>
-      <ellipse className="s03-pot__rim" cx="130" cy="195" rx="94" ry="34" />
-      <ellipse className="s03-pot__soil" cx="130" cy="191" rx="79" ry="22" />
-      <path className="s03-pot__body" d="M48 203h164l-22 99c-2 9-10 15-19 15H89c-9 0-17-6-19-15l-22-99Z" />
-      <path className="s03-pot__lip" d="M40 194h180v31c0 8-6 14-14 14H54c-8 0-14-6-14-14v-31Z" />
     </svg>
   )
 }
@@ -201,7 +165,7 @@ export function SeedPlantingContent({
       </div>
       <div className="s03-visual s03-visual--completed">
         {viewState.isNew ? <span className="s03-new-badge">NEW</span> : null}
-        <CompletedPlant plantId={viewState.plantId} />
+        <CompletedPlantVisual plantId={viewState.plantId} />
       </div>
       <p className="s03-plant-name">{viewState.displayName}</p>
       <div className="s03-actions s03-actions--completed">
