@@ -79,9 +79,9 @@ if [ "$NEEDS_INSTALL" = true ]; then
   echo "$CURRENT_PLATFORM" > "$PLATFORM_MARKER"
 fi
 
-PORT_ARGS=()
+PORT_ARGS=(--host)
 if [ -n "$PORT" ]; then
-  PORT_ARGS=(--port "$PORT")
+  PORT_ARGS+=(--port "$PORT")
 fi
 
 if [ "$MODE" = "dev" ]; then

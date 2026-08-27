@@ -54,7 +54,7 @@ if ($needsInstall) {
     Set-Content -Path $platformMarker -Value $currentPlatform -NoNewline
 }
 
-$viteArgs = @()
+$viteArgs = @('--host')
 if ($Port) {
     $viteArgs += @('--port', $Port)
 }
