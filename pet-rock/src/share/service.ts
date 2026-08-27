@@ -23,6 +23,12 @@ function getBrowserUrl(runtimeWindow: Window | undefined): string | undefined {
   return url
 }
 
+export function isAppsInTossRuntime(
+  runtimeWindow: Readonly<{ ReactNativeWebView?: unknown }> | undefined,
+): boolean {
+  return runtimeWindow?.ReactNativeWebView != null
+}
+
 export function createRockShareService(runtime: RockShareRuntime): RockShareService {
   return {
     share(model: RockShareModel): Promise<ShareResult> {
@@ -38,11 +44,12 @@ export function createDefaultRockShareService(
     typeof window === 'undefined' ? undefined : (window as RuntimeWindow),
 ): RockShareService {
   return createRockShareService({
-    isAppsInToss: runtimeWindow?.ReactNativeWebView != null,
+    isAppsInToss: isAppsInTossRuntime(runtimeWindow),
     appsInToss: createAppsInTossShareService(),
     browser: createBrowserShareService(
       runtimeWindow?.navigator,
       getBrowserUrl(runtimeWindow),
+      runtimeWindow?.isSecureContext === true,
     ),
   })
 }

@@ -12,10 +12,11 @@ function isAbortError(error: unknown): boolean {
 export function createBrowserShareService(
   navigatorApi: BrowserShareApi | undefined,
   currentUrl: string | undefined,
+  isSecureContext = true,
 ): RockShareService {
   return {
     async share(model: RockShareModel): Promise<ShareResult> {
-      if (navigatorApi?.share === undefined || currentUrl === undefined) {
+      if (!isSecureContext || navigatorApi?.share === undefined || currentUrl === undefined) {
         return { status: 'unavailable' }
       }
 

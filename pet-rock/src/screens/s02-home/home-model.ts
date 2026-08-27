@@ -7,6 +7,7 @@ import type {
   RockId,
 } from '../../domain'
 import type { AppNavigation } from '../../app/index'
+import type { ShareResult } from '../../share'
 
 export type HomeElapsedState = 'none' | GrowthStage
 
@@ -19,6 +20,10 @@ export type HomeRenderModel = Readonly<{
 
 export type HomeMenuAction = 'plant-seed' | 'plant-storage' | 'share'
 export type HomeMenuDismissal = 'action-button' | 'system-back' | 'outside' | 'selection'
+export type HomeShareNotice = Readonly<{
+  message: string
+  tone: 'neutral' | 'error'
+}> | null
 
 export function createHomeRenderModel(
   gameState: GameState,
@@ -53,5 +58,18 @@ export function requestHomeMenuAction(
     case 'share':
       onShare()
       return true
+  }
+}
+
+export function createHomeShareNotice(result: ShareResult): HomeShareNotice {
+  switch (result.status) {
+    case 'shared':
+      return { message: '공유 창을 열었어요.', tone: 'neutral' }
+    case 'cancelled':
+      return null
+    case 'unavailable':
+      return { message: '이 환경에서는 공유 기능을 지원하지 않아요.', tone: 'error' }
+    case 'failed':
+      return { message: '공유하지 못했어요. 잠시 후 다시 시도해주세요.', tone: 'error' }
   }
 }
