@@ -7,14 +7,17 @@
   --storage-preview-soft: #fff8e8;
   --storage-paper: #fbfaf4;
   --storage-line: #dde3da;
+  position: relative;
   box-sizing: border-box;
   display: flex;
   height: 100%;
   min-height: 0;
   width: min(100%, 680px);
   margin: 0 auto;
-  padding: max(28px, env(safe-area-inset-top)) 24px
-    max(14px, env(safe-area-inset-bottom));
+  padding: max(28px, calc(var(--app-safe-top) + 16px))
+    max(24px, calc(var(--app-safe-right) + 16px))
+    max(14px, calc(var(--app-safe-bottom) + 10px))
+    max(24px, calc(var(--app-safe-left) + 16px));
   flex-direction: column;
   overflow: hidden;
   color: var(--storage-ink);
@@ -39,6 +42,7 @@
   grid-template-columns: 44px 1fr;
   align-items: center;
   gap: 12px;
+  flex: 0 0 auto;
   margin-bottom: 26px;
 }
 
@@ -86,6 +90,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 6px;
+  flex: 0 0 auto;
   margin-bottom: 24px;
   padding: 5px;
   border: 1px solid var(--storage-line);
@@ -144,7 +149,7 @@
 }
 
 .plant-storage__panel--with-apply {
-  padding-bottom: 102px;
+  padding-bottom: calc(102px + var(--app-safe-bottom));
 }
 
 .storage-preview {
@@ -480,11 +485,11 @@ button.plant-card {
 }
 
 .plant-storage__apply {
-  position: fixed;
+  position: absolute;
   z-index: 10;
-  bottom: max(14px, env(safe-area-inset-bottom));
-  right: max(16px, env(safe-area-inset-right));
-  left: max(16px, env(safe-area-inset-left));
+  bottom: max(14px, calc(var(--app-safe-bottom) + 10px));
+  right: max(16px, calc(var(--app-safe-right) + 16px));
+  left: max(16px, calc(var(--app-safe-left) + 16px));
   display: grid;
   width: auto;
   max-width: 632px;
@@ -662,10 +667,10 @@ button.plant-card {
 }
 
 .plant-storage__error {
-  position: fixed;
+  position: absolute;
   z-index: 20;
   right: 20px;
-  bottom: 105px;
+  bottom: calc(105px + var(--app-safe-bottom));
   left: 20px;
   max-width: 600px;
   margin: auto;
