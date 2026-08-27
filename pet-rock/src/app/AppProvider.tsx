@@ -23,5 +23,16 @@ export function AppProvider({
     void store.initialize()
   }, [store])
 
+  useEffect(() => {
+    function refreshAfterResume() {
+      if (document.visibilityState === 'visible') {
+        void store.actions.refreshGrowth()
+      }
+    }
+
+    document.addEventListener('visibilitychange', refreshAfterResume)
+    return () => document.removeEventListener('visibilitychange', refreshAfterResume)
+  }, [store])
+
   return <AppStoreContext value={store}>{children}</AppStoreContext>
 }
