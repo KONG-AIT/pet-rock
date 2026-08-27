@@ -158,6 +158,8 @@ export function SeedPlantingContent({
     )
   }
 
+  const isCompletionActionPending = pendingAction === 'equip' || pendingAction === 'store'
+
   return (
     <section className="s03-state s03-state--completed">
       <div className="s03-copy">
@@ -173,7 +175,7 @@ export function SeedPlantingContent({
         <button
           className="s03-button s03-button--primary"
           type="button"
-          disabled={pendingAction !== null}
+          disabled={isCompletionActionPending}
           onClick={onEquip}
         >
           {pendingAction === 'equip' ? '심는 중…' : '머리에 심기'}
@@ -181,7 +183,7 @@ export function SeedPlantingContent({
         <button
           className="s03-button s03-button--secondary"
           type="button"
-          disabled={pendingAction !== null}
+          disabled={isCompletionActionPending}
           onClick={onStore}
         >
           {pendingAction === 'store' ? '보관하는 중…' : '보관하기'}
@@ -238,10 +240,15 @@ export function S03SeedPlantingPage() {
 
     const result = await action()
 
-    if (!result.ok) {
-      setErrorMessage('저장하지 못했어요. 잠시 후 다시 시도해 주세요.')
-      setPendingAction(null)
+    if (result.ok) {
+      if (pending === 'plant') {
+        setPendingAction(null)
+      }
+      return
     }
+
+    setErrorMessage('저장하지 못했어요. 잠시 후 다시 시도해 주세요.')
+    setPendingAction(null)
   }
 
   return (

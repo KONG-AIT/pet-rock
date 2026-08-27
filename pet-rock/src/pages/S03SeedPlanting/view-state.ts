@@ -8,6 +8,8 @@ import {
   type Result,
 } from '../../domain'
 
+const GROWTH_REFRESH_BOUNDARY_BUFFER_MS = 50
+
 export type SeedPlantingViewState =
   | Readonly<{
       status: 'empty'
@@ -49,8 +51,8 @@ export function formatRemainingTime(remainingMs: number): string {
   return minutes === 0 ? `${hours}시간` : `${hours}시간 ${minutes}분`
 }
 
-// 다음 성장 단계 전환(또는 완료) 시점까지 남은 시간을 반환한다. 고정 간격 폴링 대신
-// 이 값으로 단발성 타이머를 걸어 전환 시점에 정확히 재확인하도록 하기 위함이다.
+// 다음 성장 단계 전환(또는 완료) 직후까지 남은 시간을 반환한다. 타이머와 성장 판정에
+// 쓰이는 clock 사이의 미세한 오차로 경계 직전에 재조회되는 일을 막기 위해 짧은 여유를 둔다.
 export function getGrowthPollDelayMs(
   growth: Result<GrowthView> | null,
   observedAt: number,
@@ -63,7 +65,9 @@ export function getGrowthPollDelayMs(
   const nextBoundaryAt =
     stage === 'planted' ? plantedAt + GROWING_STAGE_START_MS : plantedAt + GROWTH_COMPLETE_MS
 
-  return Math.max(0, nextBoundaryAt - observedAt)
+  const remainingMs = nextBoundaryAt - observedAt
+
+  return remainingMs <= 0 ? 0 : remainingMs + GROWTH_REFRESH_BOUNDARY_BUFFER_MS
 }
 
 export function getSeedPlantingViewState(
