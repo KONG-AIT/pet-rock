@@ -17,7 +17,7 @@ import {
   requestHomeMenuAction,
   type HomeMenuAction,
 } from './home-model'
-import { requestRockShareOnce } from './home-share'
+import { requestRockShareOnce, shareThenUnwindMenu } from './home-share'
 import './styles.css'
 
 export type HomeScreenProps = Readonly<{
@@ -86,11 +86,11 @@ export function HomeScreen({
     setMenuOpen(nextMenuOpenState(menuOpen, 'selection'))
 
     if (action === 'share') {
-      // Start the share call before traversing history so browser user activation is preserved.
+      // Start the share call before traversing history so browser user activation is preserved,
+      // and keep the history entry open until the share flow settles (see shareThenUnwindMenu).
       requestHomeMenuAction(action, navigation, () => {
-        void performShare()
+        shareThenUnwindMenu(performShare, unwindMenuHistory)
       })
-      unwindMenuHistory()
       return
     }
 

@@ -22,3 +22,13 @@ export async function requestRockShareOnce(
     inFlight.current = false
   }
 }
+
+// Keeps the menu's history entry open until the share flow settles, so the
+// history navigation used to close the menu never lands in the same tick as
+// the still-pending navigator.share() call.
+export function shareThenUnwindMenu(
+  performShare: () => Promise<unknown>,
+  unwindMenuHistory: () => void,
+): void {
+  void performShare().then(unwindMenuHistory, unwindMenuHistory)
+}

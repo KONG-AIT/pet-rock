@@ -11,7 +11,7 @@ import {
   type HomeRenderModel,
   type HomeShareNotice,
 } from './home-model'
-import { requestRockShareOnce } from './home-share'
+import { requestRockShareOnce, shareThenUnwindMenu } from './home-share'
 
 const state: GameState = {
   rock: { id: 'rock-02', name: '몽돌' as GameState['rock']['name'], adoptedAt: 1_000 },
@@ -172,5 +172,38 @@ describe('S02 action menu behavior', () => {
       status: 'failed',
     })
     expect(inFlight.current).toBe(false)
+  })
+
+  it('keeps the menu history entry open until the share flow settles', async () => {
+    let finishShare: (() => void) | undefined
+    const performShare = vi.fn(
+      () =>
+        new Promise<void>((resolve) => {
+          finishShare = resolve
+        }),
+    )
+    const unwindMenuHistory = vi.fn()
+
+    shareThenUnwindMenu(performShare, unwindMenuHistory)
+
+    expect(performShare).toHaveBeenCalledOnce()
+    expect(unwindMenuHistory).not.toHaveBeenCalled()
+
+    finishShare?.()
+    await Promise.resolve()
+    await Promise.resolve()
+
+    expect(unwindMenuHistory).toHaveBeenCalledOnce()
+  })
+
+  it('still unwinds the menu history entry when the share flow rejects', async () => {
+    const performShare = vi.fn().mockRejectedValueOnce(new Error('unexpected'))
+    const unwindMenuHistory = vi.fn()
+
+    shareThenUnwindMenu(performShare, unwindMenuHistory)
+    await Promise.resolve()
+    await Promise.resolve()
+
+    expect(unwindMenuHistory).toHaveBeenCalledOnce()
   })
 })
