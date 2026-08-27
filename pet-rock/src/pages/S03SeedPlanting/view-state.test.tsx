@@ -90,6 +90,22 @@ describe('S03 seed planting view states', () => {
     expect(html).toContain('보관하기')
   })
 
+  it('keeps completed actions enabled after the planting action has finished', () => {
+    const planted = unwrap(plantSeed(initialState(), ADOPTED_AT, () => 'plant-03'))
+    const completed = unwrap(completePlantGrowth(planted, ADOPTED_AT + SIX_HOURS))
+    const viewState = getSeedPlantingViewState(
+      completed,
+      getGrowthView(completed, ADOPTED_AT + SIX_HOURS),
+    )
+    const html = renderToStaticMarkup(
+      <SeedPlantingContent viewState={viewState} {...callbacks} pendingAction="plant" />,
+    )
+
+    expect(html).toContain('머리에 심기')
+    expect(html).toContain('보관하기')
+    expect(html).not.toContain('disabled=""')
+  })
+
   it('does not mark an already owned completed plant as new', () => {
     const owned = { ...initialState(), ownedPlants: ['plant-01'] as const }
     const planted = unwrap(plantSeed(owned, ADOPTED_AT, () => 'plant-01'))
