@@ -155,6 +155,7 @@ describe('S04 plant storage view', () => {
     expect(html).toContain('미획득')
     expect(html).toContain('머리에 심기')
     expect(html).toContain('disabled=""')
+    expect(html).toContain('plant-storage__panel--with-apply')
   })
 
   it('renders one aggregated seed card and its planting action', () => {
@@ -172,6 +173,8 @@ describe('S04 plant storage view', () => {
     expect(html.match(/기본 씨앗/g)).toHaveLength(2)
     expect(html).toContain('×4')
     expect(html).toContain('심기')
+    expect(html).toContain('class="plant-storage__panel"')
+    expect(html).not.toContain('plant-storage__panel--with-apply')
   })
 
   it('judges empty states independently for each tab', () => {
@@ -198,6 +201,7 @@ describe('S04 plant storage view', () => {
 
     expect(plantsEmpty).toContain('아직 보관함이 비어 있어요')
     expect(plantsEmpty).not.toContain('가지고 있는 씨앗이 없어요')
+    expect(plantsEmpty).not.toContain('plant-storage__panel--with-apply')
     expect(seedsEmpty).toContain('가지고 있는 씨앗이 없어요')
     expect(seedsEmpty).not.toContain('아직 보관함이 비어 있어요')
   })

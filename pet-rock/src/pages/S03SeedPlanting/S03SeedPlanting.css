@@ -7,11 +7,16 @@
   --s03-pot: #bd8c68;
   --s03-pot-dark: #8b5f43;
   width: min(100%, 540px);
-  min-height: 100svh;
+  height: 100%;
+  min-height: 0;
   margin: 0 auto;
+  padding-bottom: env(safe-area-inset-bottom);
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
   color: var(--s03-ink);
   background:
     radial-gradient(circle at 50% 36%, rgba(236, 230, 207, 0.55), transparent 34%),
@@ -20,8 +25,11 @@
 
 .s03-header {
   position: relative;
-  min-height: 78px;
+  min-height: calc(78px + env(safe-area-inset-top));
+  padding-top: env(safe-area-inset-top);
+  box-sizing: border-box;
   display: grid;
+  flex: 0 0 auto;
   place-items: center;
   border-bottom: 1px solid rgba(55, 49, 39, 0.1);
 }
@@ -68,8 +76,8 @@
 }
 
 .s03-state {
-  flex: 1;
-  min-height: 620px;
+  flex: 1 0 auto;
+  min-height: 0;
   padding: clamp(88px, 11svh, 118px) 28px 30px;
   box-sizing: border-box;
   display: flex;
@@ -411,6 +419,10 @@
   font-size: 13px;
 }
 
+.s03-error:empty {
+  display: none;
+}
+
 @keyframes s03-seed-float {
   0%,
   100% { transform: translateY(0) rotate(13deg); }
@@ -462,7 +474,6 @@
 
 @media (max-width: 480px) {
   .s03-state {
-    min-height: calc(100svh - 100px);
     padding-inline: 22px;
   }
 
