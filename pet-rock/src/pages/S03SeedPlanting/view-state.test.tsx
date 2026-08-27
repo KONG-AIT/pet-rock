@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { createInitialGameState, getGrowthView, plantSeed, completePlantGrowth } from '../../domain'
 import type { GameState, Result } from '../../domain'
 import { SeedPlantingContent } from './index'
-import { formatRemainingTime, getSeedPlantingViewState } from './view-state'
+import { formatRemainingTime, getGrowthPollDelayMs, getSeedPlantingViewState } from './view-state'
 
 const ADOPTED_AT = 1_000
 const SIX_HOURS = 6 * 60 * 60 * 1_000
@@ -110,5 +110,49 @@ describe('S03 seed planting view states', () => {
     expect(viewState).toMatchObject({ status: 'empty', seedCount: 0, canPlant: false })
     expect(html).toContain('disabled=""')
     expect(html).toContain('보유한 씨앗이 없어요.')
+  })
+
+  describe('getGrowthPollDelayMs', () => {
+    it('returns null when there is no growth in progress', () => {
+      const state = initialState()
+
+      expect(getGrowthPollDelayMs(getGrowthView(state, ADOPTED_AT), ADOPTED_AT)).toBeNull()
+      expect(getGrowthPollDelayMs(null, ADOPTED_AT)).toBeNull()
+      expect(getGrowthPollDelayMs({ ok: false, error: { code: 'invalid_time' } }, ADOPTED_AT)).toBeNull()
+    })
+
+    it('returns null once growth has completed', () => {
+      const planted = unwrap(plantSeed(initialState(), ADOPTED_AT, () => 'plant-02'))
+      const completed = unwrap(completePlantGrowth(planted, ADOPTED_AT + SIX_HOURS))
+
+      expect(
+        getGrowthPollDelayMs(getGrowthView(completed, ADOPTED_AT + SIX_HOURS), ADOPTED_AT + SIX_HOURS),
+      ).toBeNull()
+    })
+
+    it('targets the planted-to-growing stage boundary while still planted', () => {
+      const planted = unwrap(plantSeed(initialState(), ADOPTED_AT, () => 'plant-02'))
+      const observedAt = ADOPTED_AT + 60 * 60 * 1_000
+
+      expect(getGrowthPollDelayMs(getGrowthView(planted, observedAt), observedAt)).toBe(
+        2 * 60 * 60 * 1_000,
+      )
+    })
+
+    it('targets the completion boundary once the growing stage has started', () => {
+      const planted = unwrap(plantSeed(initialState(), ADOPTED_AT, () => 'plant-02'))
+      const observedAt = ADOPTED_AT + 4 * 60 * 60 * 1_000
+
+      expect(getGrowthPollDelayMs(getGrowthView(planted, observedAt), observedAt)).toBe(
+        2 * 60 * 60 * 1_000,
+      )
+    })
+
+    it('never returns a negative delay when a boundary has already passed', () => {
+      const planted = unwrap(plantSeed(initialState(), ADOPTED_AT, () => 'plant-02'))
+      const observedAt = ADOPTED_AT + SIX_HOURS + 1_000
+
+      expect(getGrowthPollDelayMs(getGrowthView(planted, observedAt), observedAt)).toBe(0)
+    })
   })
 })
