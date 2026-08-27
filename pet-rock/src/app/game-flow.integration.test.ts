@@ -6,6 +6,7 @@ import {
   type GameState,
   type Result,
 } from '../domain'
+import { createDevelopmentClock } from '../dev/growth-clock'
 import { shareRock, type RockShareService, type ShareResult } from '../share'
 import { createInMemoryGameStorage } from '../storage'
 import { APP_ROUTES } from './routes'
@@ -50,6 +51,41 @@ function currentGameState(app: ReturnType<typeof createAppStore>): GameState {
 }
 
 describe('whole game flow integration', () => {
+  it('grows two plants consecutively with the development clock', async () => {
+    const clock = createDevelopmentClock(null, () => STARTED_AT)
+    const storage = createInMemoryGameStorage()
+    const app = createAppStore({
+      storage,
+      now: clock.now,
+      selectPlant: () => 'plant-02',
+    })
+    await app.initialize()
+    await app.actions.adoptRock({ rockId: 'rock-03', name: '조약돌' })
+
+    for (let growthNumber = 0; growthNumber < 2; growthNumber += 1) {
+      expect(app.navigation.navigate('openPlanting')).toBe(true)
+      await expect(app.actions.plantSeed()).resolves.toEqual({ ok: true, value: undefined })
+      const growth = currentGameState(app).plantGrowth
+      expect(growth?.status).toBe('growing')
+      if (growth === null) {
+        throw new Error('Expected a planted growth')
+      }
+
+      expect(clock.moveTo(growth.plantedAt, GROWTH_COMPLETE_MS + 1)).toBe(true)
+      await expect(app.actions.refreshGrowth()).resolves.toEqual({ ok: true, value: undefined })
+      await expect(app.actions.finishGrowthToStorage()).resolves.toEqual({
+        ok: true,
+        value: undefined,
+      })
+    }
+
+    expect(currentGameState(app)).toMatchObject({
+      plantGrowth: null,
+      ownedPlants: ['plant-02'],
+      seeds: { basic: 1 },
+    })
+  })
+
   it('takes a new user from adoption through growth, storage, equipment, and relaunch', async () => {
     const { app, storage, advanceBy } = createHarness()
     await app.initialize()

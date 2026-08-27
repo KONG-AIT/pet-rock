@@ -291,6 +291,29 @@ describe('game actions', () => {
     expect(storage.saves).toHaveLength(1)
   })
 
+  it('does not persist completion twice when time is refreshed repeatedly or moved back', async () => {
+    const planted = unwrap(plantSeed(initialState(), ADOPTED_AT, () => 'plant-03'))
+    const storage = new RecordingStorage(planted)
+    let currentTime = ADOPTED_AT
+    const app = createAppStore({
+      storage,
+      now: () => currentTime,
+      selectPlant: () => 'plant-01',
+    })
+    await app.initialize()
+
+    currentTime = ADOPTED_AT + GROWTH_COMPLETE_MS + 1
+    await app.actions.refreshGrowth()
+    await app.actions.refreshGrowth()
+    currentTime = ADOPTED_AT
+    await app.actions.refreshGrowth()
+
+    expect(app.getSnapshot()).toMatchObject({
+      gameState: { plantGrowth: { status: 'completed', plantId: 'plant-03' } },
+    })
+    expect(storage.saves).toHaveLength(1)
+  })
+
   it('keeps the current state when refreshed growth cannot be saved', async () => {
     const planted = unwrap(plantSeed(initialState(), ADOPTED_AT, () => 'plant-02'))
     const storage = new RecordingStorage(planted)

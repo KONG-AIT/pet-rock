@@ -4,6 +4,8 @@ import {
   createRandomPlantSelector,
   type AppScreens,
 } from './app/index'
+import { DevelopmentGrowthClock } from './dev/DevelopmentGrowthClock'
+import { createDevelopmentClock } from './dev/growth-clock'
 import { RockSelectionScreen } from './screens/s01-rock-selection'
 import { HomeScreen } from './screens/s02-home'
 import { PlantingScreen } from './screens/s03-planting'
@@ -12,6 +14,9 @@ import { createAppsInTossGameStorage } from './storage'
 
 const storage = createAppsInTossGameStorage()
 const selectPlant = createRandomPlantSelector()
+const developmentClock = import.meta.env.DEV
+  ? createDevelopmentClock()
+  : null
 const screens: AppScreens = {
   RockSelection: RockSelectionScreen,
   Home: HomeScreen,
@@ -21,8 +26,15 @@ const screens: AppScreens = {
 
 function App() {
   return (
-    <AppProvider storage={storage} selectPlant={selectPlant}>
+    <AppProvider
+      storage={storage}
+      selectPlant={selectPlant}
+      now={developmentClock?.now}
+    >
       <AppRouter screens={screens} />
+      {developmentClock !== null ? (
+        <DevelopmentGrowthClock clock={developmentClock} />
+      ) : null}
     </AppProvider>
   )
 }
