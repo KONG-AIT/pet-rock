@@ -9,6 +9,7 @@ import {
   type PlantSelector,
   type Result,
 } from '../domain'
+import { refillBasicSeeds } from '../dev/seed-refill'
 import type { GameStorage } from '../storage'
 import { APP_ROUTES, getNavigationDestination, type NavigationCommand } from './routes'
 import type {
@@ -18,6 +19,7 @@ import type {
   AppActionResult,
   AppNavigation,
   AppSnapshot,
+  DevGameActions,
   GameActions,
 } from './types'
 
@@ -34,6 +36,7 @@ export interface AppStore {
   initialize(): Promise<void>
   readonly actions: GameActions
   readonly navigation: AppNavigation
+  readonly devActions: DevGameActions | null
 }
 
 export type CreateAppStoreOptions = Readonly<{
@@ -325,6 +328,14 @@ export function createAppStore({ storage, now, selectPlant }: CreateAppStoreOpti
     },
   }
 
+  const devActions: DevGameActions | null = import.meta.env.DEV
+    ? {
+        refillSeeds() {
+          return enqueue(() => saveTransition(refillBasicSeeds))
+        },
+      }
+    : null
+
   const navigation: AppNavigation = {
     navigate(command) {
       if (snapshot.status !== 'ready') {
@@ -355,6 +366,7 @@ export function createAppStore({ storage, now, selectPlant }: CreateAppStoreOpti
     initialize,
     actions,
     navigation,
+    devActions,
   }
 }
 

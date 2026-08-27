@@ -2,7 +2,13 @@ export { AppProvider } from './AppProvider'
 export { AppRouter } from './AppRouter'
 export type { AppScreens } from './AppRouter'
 export { useTransientHistoryEntry } from './history-entry'
-export { useAppNavigation, useAppSnapshot, useGameActions, useGameQueries } from './hooks'
+export {
+  useAppNavigation,
+  useAppSnapshot,
+  useDevGameActions,
+  useGameActions,
+  useGameQueries,
+} from './hooks'
 export {
   APP_ROUTES,
   NAVIGATION_DESTINATIONS,
@@ -18,6 +24,7 @@ export type {
   AppError,
   AppNavigation,
   AppSnapshot,
+  DevGameActions,
   GameActions,
   GameQueries,
 } from './types'
