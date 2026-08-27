@@ -35,12 +35,6 @@
   }
 }
 
-@supports (height: 100dvh) {
-  :root {
-    --app-viewport-height: 100dvh;
-  }
-}
-
 @media (prefers-color-scheme: dark) {
   :root {
     --text: #9ca3af;
