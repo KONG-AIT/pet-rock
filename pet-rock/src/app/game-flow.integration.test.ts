@@ -187,6 +187,41 @@ describe('whole game flow integration', () => {
     })
   })
 
+  it('finishes duplicate growth for the already-equipped plant and returns home', async () => {
+    const state: GameState = {
+      ...unwrap(
+        createInitialGameState({ rockId: 'rock-01', name: '돌이', adoptedAt: STARTED_AT }),
+      ),
+      ownedPlants: ['plant-02'],
+      equipment: { status: 'equipped', plantId: 'plant-02' },
+    }
+    const { app, storage, advanceBy } = createHarness(state)
+    await app.initialize()
+
+    expect(app.navigation.navigate('openPlanting')).toBe(true)
+    await expect(app.actions.plantSeed()).resolves.toEqual({ ok: true, value: undefined })
+
+    advanceBy(GROWTH_COMPLETE_MS)
+    await expect(app.actions.refreshGrowth()).resolves.toEqual({ ok: true, value: undefined })
+    await expect(app.actions.finishGrowthWithEquipment()).resolves.toEqual({
+      ok: true,
+      value: undefined,
+    })
+
+    expect(app.getSnapshot()).toMatchObject({
+      route: APP_ROUTES.home,
+      gameState: {
+        plantGrowth: null,
+        ownedPlants: ['plant-02'],
+        equipment: { status: 'equipped', plantId: 'plant-02' },
+      },
+    })
+    await expect(storage.load()).resolves.toEqual({
+      ok: true,
+      value: currentGameState(app),
+    })
+  })
+
   it.each<ShareResult>([
     { status: 'shared' },
     { status: 'cancelled' },
