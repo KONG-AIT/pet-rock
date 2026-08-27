@@ -360,6 +360,73 @@ describe('game actions', () => {
     expect(storage.state).toEqual(snapshot.gameState)
   })
 
+  it('finishes duplicate growth for the plant already equipped without a domain error', async () => {
+    const planted = unwrap(plantSeed(initialState(), ADOPTED_AT, () => 'plant-01'))
+    const storage = new RecordingStorage(planted)
+    let currentTime = ADOPTED_AT + GROWTH_COMPLETE_MS
+    const app = createAppStore({
+      storage,
+      now: () => currentTime,
+      selectPlant: () => 'plant-01',
+    })
+    await app.initialize()
+    app.navigation.navigate('openPlanting')
+    expect(await app.actions.finishGrowthWithEquipment()).toEqual({
+      ok: true,
+      value: undefined,
+    })
+
+    app.navigation.navigate('backHome')
+    currentTime += 1
+    expect(await app.actions.plantSeed()).toEqual({ ok: true, value: undefined })
+    currentTime += GROWTH_COMPLETE_MS
+    expect(await app.actions.refreshGrowth()).toEqual({ ok: true, value: undefined })
+    app.navigation.navigate('openPlanting')
+
+    expect(await app.actions.finishGrowthWithEquipment()).toEqual({
+      ok: true,
+      value: undefined,
+    })
+
+    const snapshot = app.getSnapshot()
+    expect(snapshot.route).toBe(APP_ROUTES.home)
+    expect(snapshot.gameState?.plantGrowth).toBeNull()
+    expect(snapshot.gameState?.ownedPlants).toEqual(['plant-01'])
+    expect(snapshot.gameState?.equipment).toEqual({
+      status: 'equipped',
+      plantId: 'plant-01',
+    })
+    expect(storage.state).toEqual(snapshot.gameState)
+  })
+
+  it('replaces the equipped plant when duplicate growth completes for a different owned plant', async () => {
+    const owned: GameState = {
+      ...initialState(),
+      ownedPlants: ['plant-01', 'plant-02'],
+      equipment: { status: 'equipped', plantId: 'plant-02' },
+    }
+    const planted = unwrap(plantSeed(owned, ADOPTED_AT, () => 'plant-01'))
+    const storage = new RecordingStorage(planted)
+    const app = store(storage, ADOPTED_AT + GROWTH_COMPLETE_MS)
+    await app.initialize()
+    app.navigation.navigate('openPlanting')
+
+    expect(await app.actions.finishGrowthWithEquipment()).toEqual({
+      ok: true,
+      value: undefined,
+    })
+
+    const snapshot = app.getSnapshot()
+    expect(snapshot.route).toBe(APP_ROUTES.home)
+    expect(snapshot.gameState?.plantGrowth).toBeNull()
+    expect(snapshot.gameState?.ownedPlants).toEqual(['plant-01', 'plant-02'])
+    expect(snapshot.gameState?.equipment).toEqual({
+      status: 'equipped',
+      plantId: 'plant-01',
+    })
+    expect(storage.state).toEqual(snapshot.gameState)
+  })
+
   it('collects a completed plant and opens storage without changing equipment', async () => {
     const planted = unwrap(plantSeed(initialState(), ADOPTED_AT, () => 'plant-02'))
     const storage = new RecordingStorage(planted)

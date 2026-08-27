@@ -303,7 +303,13 @@ export function createAppStore({ storage, now, selectPlant }: CreateAppStoreOpti
             return collectCompletedPlant(state)
           }
 
-          return equipPlant(collected.value, completedGrowth.plantId)
+          const equipped = equipPlant(collected.value, completedGrowth.plantId)
+
+          if (!equipped.ok && equipped.error.code === 'plant_already_equipped') {
+            return collected
+          }
+
+          return equipped
         }, 'finishGrowthEquipped'),
       )
     },
