@@ -10,6 +10,7 @@ import type { AppActionResult } from '../../app/index'
 import { CompletedPlantVisual } from '../../components/visuals'
 import {
   formatRemainingTime,
+  getGrowthPollDelayMs,
   getSeedPlantingViewState,
   type SeedPlantingViewState,
 } from './view-state'
@@ -214,17 +215,19 @@ export function S03SeedPlantingPage() {
     }
   }, [actions])
 
+  const growthPollDelayMs = getGrowthPollDelayMs(queries.growth, observedAt)
+
   useEffect(() => {
-    if (viewState.status !== 'growing') {
+    if (growthPollDelayMs === null) {
       return
     }
 
-    const refreshTimer = window.setInterval(() => {
+    const refreshTimer = window.setTimeout(() => {
       void actions.refreshGrowth()
-    }, 60 * 1_000)
+    }, growthPollDelayMs)
 
-    return () => window.clearInterval(refreshTimer)
-  }, [actions, viewState.status])
+    return () => window.clearTimeout(refreshTimer)
+  }, [actions, growthPollDelayMs])
 
   async function runAction(
     pending: Exclude<PendingAction, null>,

@@ -1,4 +1,5 @@
 import {
+  GROWING_STAGE_START_MS,
   GROWTH_COMPLETE_MS,
   PLANT_CATALOG,
   type GameState,
@@ -46,6 +47,23 @@ export function formatRemainingTime(remainingMs: number): string {
   }
 
   return minutes === 0 ? `${hours}시간` : `${hours}시간 ${minutes}분`
+}
+
+// 다음 성장 단계 전환(또는 완료) 시점까지 남은 시간을 반환한다. 고정 간격 폴링 대신
+// 이 값으로 단발성 타이머를 걸어 전환 시점에 정확히 재확인하도록 하기 위함이다.
+export function getGrowthPollDelayMs(
+  growth: Result<GrowthView> | null,
+  observedAt: number,
+): number | null {
+  if (growth === null || !growth.ok || growth.value.status !== 'growing') {
+    return null
+  }
+
+  const { plantedAt, stage } = growth.value
+  const nextBoundaryAt =
+    stage === 'planted' ? plantedAt + GROWING_STAGE_START_MS : plantedAt + GROWTH_COMPLETE_MS
+
+  return Math.max(0, nextBoundaryAt - observedAt)
 }
 
 export function getSeedPlantingViewState(
