@@ -61,9 +61,22 @@ fi
 
 cd "$APP_DIR"
 
+CURRENT_PLATFORM="$(node -e 'process.stdout.write(process.platform + "-" + process.arch)')"
+PLATFORM_MARKER="node_modules/.pet-rock-install-platform"
+
+NEEDS_INSTALL=false
 if [ ! -d node_modules ]; then
-  echo "의존성이 설치되어 있지 않아 npm install을 실행합니다..."
+  NEEDS_INSTALL=true
+elif [ ! -f "$PLATFORM_MARKER" ] || [ "$(cat "$PLATFORM_MARKER")" != "$CURRENT_PLATFORM" ]; then
+  echo "다른 플랫폼에서 설치된 의존성을 감지해 node_modules를 다시 설치합니다..."
+  rm -rf node_modules
+  NEEDS_INSTALL=true
+fi
+
+if [ "$NEEDS_INSTALL" = true ]; then
+  echo "의존성을 설치합니다 ($CURRENT_PLATFORM)..."
   npm install
+  echo "$CURRENT_PLATFORM" > "$PLATFORM_MARKER"
 fi
 
 PORT_ARGS=()

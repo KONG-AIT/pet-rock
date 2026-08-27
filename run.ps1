@@ -34,10 +34,24 @@ if (-not (Test-Path $AppDir)) {
 
 Set-Location $AppDir
 
-if (-not (Test-Path (Join-Path $AppDir 'node_modules'))) {
-    Write-Host '의존성이 설치되어 있지 않아 npm install을 실행합니다...'
+$currentPlatform = (node -e "process.stdout.write(process.platform + '-' + process.arch)")
+$nodeModulesDir = Join-Path $AppDir 'node_modules'
+$platformMarker = Join-Path $nodeModulesDir '.pet-rock-install-platform'
+
+$needsInstall = $false
+if (-not (Test-Path $nodeModulesDir)) {
+    $needsInstall = $true
+} elseif (-not (Test-Path $platformMarker) -or (Get-Content $platformMarker -Raw).Trim() -ne $currentPlatform) {
+    Write-Host '다른 플랫폼에서 설치된 의존성을 감지해 node_modules를 다시 설치합니다...'
+    Remove-Item -Recurse -Force $nodeModulesDir
+    $needsInstall = $true
+}
+
+if ($needsInstall) {
+    Write-Host "의존성을 설치합니다 ($currentPlatform)..."
     npm install
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+    Set-Content -Path $platformMarker -Value $currentPlatform -NoNewline
 }
 
 $viteArgs = @()
