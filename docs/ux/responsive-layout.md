@@ -8,7 +8,7 @@ S01~S04가 Apps in Toss 모바일 viewport에서 같은 높이, safe area, scrol
 
 ### Viewport 소유권
 
-* 앱 shell만 viewport 높이를 소유해요. 기본값은 `100svh`, 지원 환경에서는 모바일 키보드와 브라우저 UI 변화에 반응하는 `100dvh`를 사용합니다.
+* 앱 shell만 viewport 높이를 소유해요. `100svh`(브라우저 UI가 모두 펼쳐진 상태 기준 최소 높이)를 사용합니다. `100dvh`는 일부 Android 브라우저에서 툴바 상태와 어긋나 모든 화면에 동일한 양의 phantom scroll을 유발하는 사례가 확인되어 채택하지 않습니다.
 * `html`, `body`, `#root`, route transition layer에서는 document scroll을 허용하지 않아요.
 * S01~S04는 shell의 `height: 100%`를 채우며 각자 `100svh` 또는 `100dvh`를 다시 선언하지 않아요.
 

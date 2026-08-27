@@ -19,7 +19,7 @@ const screenCss = {
 describe('responsive layout contract', () => {
   it('lets the app shell exclusively own the dynamic viewport', () => {
     expect(shellCss).toContain('--app-viewport-height: 100svh')
-    expect(shellCss).toContain('--app-viewport-height: 100dvh')
+    expect(shellCss).not.toMatch(/--app-viewport-height:\s*100dvh/)
     expect(shellCss).toMatch(/#root\s*{[^}]*height:\s*var\(--app-viewport-height\)/s)
     expect(routerCss).toMatch(/\.app-router\s*{[^}]*height:\s*100%/s)
 
