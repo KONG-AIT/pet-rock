@@ -56,4 +56,15 @@ describe('shared plant visuals', () => {
     expect(markup).toContain(`data-plant="${plantId}"`)
     expect(markup).toContain('aria-hidden="true"')
   })
+
+  it('gives each owned plant a visually distinct storage shape', () => {
+    const shapes = PLANT_IDS.map((plantId) => {
+      const markup = renderToStaticMarkup(<StoragePlantVisual plantId={plantId} />)
+      const match = /storage-plant--(\w+)/.exec(markup)
+      return match?.[1]
+    })
+
+    expect(shapes).toEqual(['sprout', 'flower', 'cactus'])
+    expect(new Set(shapes).size).toBe(PLANT_IDS.length)
+  })
 })

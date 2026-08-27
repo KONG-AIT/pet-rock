@@ -217,6 +217,59 @@ describe('S04 plant storage view', () => {
     )
   })
 
+  it('gives the preview a distinct shape per selected plant and a clear empty state', () => {
+    const state = gameState({
+      ownedPlants: ['plant-01', 'plant-02', 'plant-03'],
+      equipment: { status: 'equipped', plantId: 'plant-01' },
+    })
+
+    const sprout = renderToStaticMarkup(
+      <PlantStorageView
+        {...callbacks}
+        state={state}
+        activeTab="plants"
+        previewPlantId="plant-01"
+        pending={false}
+        errorMessage={null}
+      />,
+    )
+    const flower = renderToStaticMarkup(
+      <PlantStorageView
+        {...callbacks}
+        state={state}
+        activeTab="plants"
+        previewPlantId="plant-02"
+        pending={false}
+        errorMessage={null}
+      />,
+    )
+    const cactus = renderToStaticMarkup(
+      <PlantStorageView
+        {...callbacks}
+        state={state}
+        activeTab="plants"
+        previewPlantId="plant-03"
+        pending={false}
+        errorMessage={null}
+      />,
+    )
+    const none = renderToStaticMarkup(
+      <PlantStorageView
+        {...callbacks}
+        state={state}
+        activeTab="plants"
+        previewPlantId={null}
+        pending={false}
+        errorMessage={null}
+      />,
+    )
+
+    expect(sprout).toMatch(/storage-preview__plant">[\s\S]*?storage-plant--sprout/)
+    expect(flower).toMatch(/storage-preview__plant">[\s\S]*?storage-plant--flower/)
+    expect(cactus).toMatch(/storage-preview__plant">[\s\S]*?storage-plant--cactus/)
+    expect(none).not.toContain('storage-preview__plant')
+  })
+
   it('renders one aggregated seed card and its planting action', () => {
     const html = renderToStaticMarkup(
       <PlantStorageView
