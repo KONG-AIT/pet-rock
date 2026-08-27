@@ -468,6 +468,11 @@ button.plant-card {
   font-size: 9px;
   font-weight: 900;
   letter-spacing: 0.04em;
+  visibility: hidden;
+}
+
+.plant-card__preview-badge[data-active='true'] {
+  visibility: visible;
 }
 
 .plant-card--none .storage-rock {

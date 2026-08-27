@@ -196,9 +196,13 @@ export function PlantStorageView({
                     {model.currentPlantId === null && (
                       <span className="plant-card__equipped-badge">장착 중</span>
                     )}
-                    {model.previewPlantId === null && (
-                      <span className="plant-card__preview-badge">미리보기</span>
-                    )}
+                    <span
+                      className="plant-card__preview-badge"
+                      data-active={model.previewPlantId === null}
+                      aria-hidden={model.previewPlantId !== null}
+                    >
+                      미리보기
+                    </span>
                   </button>
 
                   {model.plantItems.map((item) =>
@@ -219,9 +223,13 @@ export function PlantStorageView({
                         {item.equipped && (
                           <span className="plant-card__equipped-badge">장착 중</span>
                         )}
-                        {item.selected && (
-                          <span className="plant-card__preview-badge">미리보기</span>
-                        )}
+                        <span
+                          className="plant-card__preview-badge"
+                          data-active={item.selected}
+                          aria-hidden={!item.selected}
+                        >
+                          미리보기
+                        </span>
                       </button>
                     ) : (
                       <div
