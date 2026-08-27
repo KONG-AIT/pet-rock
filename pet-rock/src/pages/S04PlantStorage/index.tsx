@@ -194,7 +194,10 @@ export function PlantStorageView({
                     </span>
                     <span className="plant-card__name">없음</span>
                     {model.currentPlantId === null && (
-                      <span className="plant-card__badge">현재</span>
+                      <span className="plant-card__equipped-badge">장착 중</span>
+                    )}
+                    {model.previewPlantId === null && (
+                      <span className="plant-card__preview-badge">미리보기</span>
                     )}
                   </button>
 
@@ -213,7 +216,12 @@ export function PlantStorageView({
                           <StoragePlantVisual plantId={item.id} />
                         </span>
                         <span className="plant-card__name">{item.displayName}</span>
-                        {item.equipped && <span className="plant-card__badge">현재</span>}
+                        {item.equipped && (
+                          <span className="plant-card__equipped-badge">장착 중</span>
+                        )}
+                        {item.selected && (
+                          <span className="plant-card__preview-badge">미리보기</span>
+                        )}
                       </button>
                     ) : (
                       <div
