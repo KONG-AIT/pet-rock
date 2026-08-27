@@ -151,6 +151,11 @@ export function PlantStorageView({
 
       {activeTab === 'plants' ? (
         <div
+          className={
+            model.completedPlantCount === 0
+              ? 'plant-storage__panel'
+              : 'plant-storage__panel plant-storage__panel--with-apply'
+          }
           id="plants-panel"
           key="plants"
           role="tabpanel"
@@ -244,6 +249,7 @@ export function PlantStorageView({
         </div>
       ) : (
         <div
+          className="plant-storage__panel"
           id="seeds-panel"
           key="seeds"
           role="tabpanel"

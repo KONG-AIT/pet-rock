@@ -8,11 +8,14 @@
   --storage-line: #dde3da;
   box-sizing: border-box;
   display: flex;
-  min-height: 100svh;
+  height: 100%;
+  min-height: 0;
   width: min(100%, 680px);
   margin: 0 auto;
-  padding: 28px 24px 116px;
+  padding: max(28px, env(safe-area-inset-top)) 24px
+    max(14px, env(safe-area-inset-bottom));
   flex-direction: column;
+  overflow: hidden;
   color: var(--storage-ink);
   background:
     radial-gradient(circle at 88% 4%, rgba(211, 229, 202, 0.6), transparent 25%),
@@ -130,6 +133,17 @@
   min-height: 0;
   flex: 1;
   flex-direction: column;
+}
+
+.plant-storage__panel {
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-gutter: stable;
+}
+
+.plant-storage__panel--with-apply {
+  padding-bottom: 102px;
 }
 
 .storage-preview {
@@ -468,9 +482,12 @@ button.plant-card {
   position: fixed;
   z-index: 10;
   bottom: max(14px, env(safe-area-inset-bottom));
-  left: 50%;
+  right: max(16px, env(safe-area-inset-right));
+  left: max(16px, env(safe-area-inset-left));
   display: grid;
-  width: min(calc(100% - 32px), 632px);
+  width: auto;
+  max-width: 632px;
+  margin-inline: auto;
   min-height: 74px;
   padding: 10px 10px 10px 17px;
   grid-template-columns: 1fr minmax(140px, 46%);
@@ -481,7 +498,6 @@ button.plant-card {
   background: rgba(255, 255, 252, 0.94);
   box-shadow: 0 16px 42px rgba(37, 53, 41, 0.18);
   backdrop-filter: blur(16px);
-  transform: translateX(-50%);
 }
 
 .plant-storage__apply strong {
@@ -736,24 +752,20 @@ button.plant-card {
 @keyframes storage-panel-enter-from-left {
   from {
     opacity: 0;
-    transform: translateX(-8px);
   }
 
   to {
     opacity: 1;
-    transform: translateX(0);
   }
 }
 
 @keyframes storage-panel-enter-from-right {
   from {
     opacity: 0;
-    transform: translateX(8px);
   }
 
   to {
     opacity: 1;
-    transform: translateX(0);
   }
 }
 
