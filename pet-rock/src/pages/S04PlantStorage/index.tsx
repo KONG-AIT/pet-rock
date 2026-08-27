@@ -274,7 +274,7 @@ export function PlantStorageView({
                   <span className="seed-card__spark seed-card__spark--two" />
                 </div>
                 <div className="seed-card__content">
-                  <p>한 종류로 차곡차곡 모여 있어요</p>
+                  <p>현재 씨앗 종류는 하나예요</p>
                   <h2>기본 씨앗</h2>
                   <strong aria-label={`기본 씨앗 ${model.seedCount}개`}>×{model.seedCount}</strong>
                 </div>
