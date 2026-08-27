@@ -147,20 +147,19 @@
 
 .s03-visual {
   position: relative;
+  flex: 1 1 0;
+  min-height: 0;
+  max-height: 330px;
   width: 100%;
-  min-height: 330px;
   display: grid;
+  grid-template-rows: minmax(0, 1fr);
   place-items: center;
-}
-
-.s03-visual--empty {
-  margin-top: 2px;
 }
 
 .s03-visual--empty > .s03-seed {
   position: absolute;
   z-index: 2;
-  top: 39px;
+  top: 10%;
   left: calc(50% - 18px);
   width: 38px;
   height: 38px;
@@ -171,9 +170,9 @@
 .s03-planting-guide {
   position: absolute;
   z-index: 1;
-  top: 85px;
+  top: 22%;
   left: 50%;
-  height: 46px;
+  height: 12%;
   border-left: 2px dashed rgba(76, 72, 61, 0.36);
 }
 
@@ -190,14 +189,10 @@
 }
 
 .s03-pot {
-  width: min(100%, 300px);
-  height: auto;
+  width: 100%;
+  height: 100%;
+  max-width: 300px;
   overflow: visible;
-}
-
-.s03-visual--empty .s03-pot,
-.s03-state--growing .s03-pot {
-  margin-top: 58px;
 }
 
 .s03-pot__shadow {
@@ -348,13 +343,13 @@
 }
 
 .s03-visual--completed {
-  min-height: 350px;
-  margin-top: 2px;
+  max-height: 350px;
 }
 
 .s03-completed-plant {
-  width: min(100%, 310px);
-  height: auto;
+  width: 100%;
+  height: 100%;
+  max-width: 310px;
   overflow: visible;
 }
 
@@ -482,14 +477,6 @@
 @media (max-width: 480px) {
   .s03-state {
     padding-inline: 22px;
-  }
-
-  .s03-visual {
-    min-height: 300px;
-  }
-
-  .s03-visual--completed {
-    min-height: 320px;
   }
 }
 
