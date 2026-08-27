@@ -2,10 +2,11 @@
   position: relative;
   display: grid;
   width: 100%;
-  height: 100svh;
+  height: 100%;
   min-height: 0;
-  flex: 0 0 100svh;
+  flex: 1 1 auto;
   overflow: hidden;
+  overscroll-behavior: none;
   isolation: isolate;
 }
 
@@ -43,10 +44,13 @@
 
 .app-router__status {
   display: grid;
-  min-height: 100svh;
+  height: 100%;
+  min-height: 0;
   margin: 0;
-  padding: max(24px, env(safe-area-inset-top)) 20px
-    max(24px, env(safe-area-inset-bottom));
+  padding: max(24px, calc(var(--app-safe-top) + 16px))
+    max(20px, calc(var(--app-safe-right) + 16px))
+    max(24px, calc(var(--app-safe-bottom) + 16px))
+    max(20px, calc(var(--app-safe-left) + 16px));
   place-items: center;
   box-sizing: border-box;
 }

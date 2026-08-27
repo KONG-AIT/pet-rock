@@ -4,7 +4,8 @@
   --home-blue: #3778d4;
   position: relative;
   box-sizing: border-box;
-  min-height: 100svh;
+  height: 100%;
+  min-height: 0;
   overflow: hidden;
   color: var(--home-ink);
   background:
@@ -16,8 +17,8 @@
 .home__name {
   position: absolute;
   z-index: 2;
-  top: max(28px, env(safe-area-inset-top));
-  left: clamp(24px, 6vw, 64px);
+  top: max(28px, calc(var(--app-safe-top) + 20px));
+  left: max(clamp(24px, 6vw, 64px), calc(var(--app-safe-left) + 20px));
   margin: 0;
   font-size: clamp(24px, 4vw, 32px);
   font-weight: 650;
@@ -136,8 +137,8 @@
 .home__actions {
   position: absolute;
   z-index: 4;
-  right: max(24px, calc(env(safe-area-inset-right) + 20px));
-  bottom: max(28px, calc(env(safe-area-inset-bottom) + 20px));
+  right: max(24px, calc(var(--app-safe-right) + 20px));
+  bottom: max(28px, calc(var(--app-safe-bottom) + 20px));
   display: flex;
   flex-direction: column;
   align-items: flex-end;
@@ -225,7 +226,7 @@
   position: absolute;
   z-index: 5;
   left: 50%;
-  bottom: max(30px, calc(env(safe-area-inset-bottom) + 22px));
+  bottom: max(30px, calc(var(--app-safe-bottom) + 22px));
   max-width: min(72vw, 360px);
   margin: 0;
   padding: 10px 15px;

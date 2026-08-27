@@ -10,13 +10,10 @@
   height: 100%;
   min-height: 0;
   margin: 0 auto;
-  padding-bottom: env(safe-area-inset-bottom);
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  overflow-x: hidden;
-  overflow-y: auto;
-  overscroll-behavior-y: contain;
+  overflow: hidden;
   color: var(--s03-ink);
   background:
     radial-gradient(circle at 50% 36%, rgba(236, 230, 207, 0.55), transparent 34%),
@@ -25,8 +22,8 @@
 
 .s03-header {
   position: relative;
-  min-height: calc(78px + env(safe-area-inset-top));
-  padding-top: env(safe-area-inset-top);
+  min-height: calc(78px + var(--app-safe-top));
+  padding-top: var(--app-safe-top);
   box-sizing: border-box;
   display: grid;
   flex: 0 0 auto;
@@ -45,7 +42,7 @@
 .s03-back-button {
   position: absolute;
   left: 16px;
-  top: 50%;
+  top: calc(var(--app-safe-top) + 39px);
   transform: translateY(-50%);
   width: 44px;
   height: 44px;
@@ -76,13 +73,19 @@
 }
 
 .s03-state {
-  flex: 1 0 auto;
+  flex: 1 1 auto;
   min-height: 0;
-  padding: clamp(88px, 11svh, 118px) 28px 30px;
+  padding: 88px max(28px, calc(var(--app-safe-right) + 20px))
+    max(30px, calc(var(--app-safe-bottom) + 20px))
+    max(28px, calc(var(--app-safe-left) + 20px));
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-gutter: stable;
 }
 
 .s03-copy {
@@ -414,7 +417,9 @@
 
 .s03-error {
   min-height: 22px;
-  padding: 0 28px 18px;
+  padding: 0 max(28px, calc(var(--app-safe-right) + 20px))
+    max(18px, calc(var(--app-safe-bottom) + 12px))
+    max(28px, calc(var(--app-safe-left) + 20px));
   color: #a2493e;
   font-size: 13px;
 }
