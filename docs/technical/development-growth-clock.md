@@ -6,6 +6,8 @@ production의 6시간 성장 규칙과 저장 데이터는 그대로 유지하�
 
 이 제어는 Vite development build에서만 로드된다. production build에는 제어 UI, query parameter, global hook을 제공하지 않는다.
 
+같은 panel에는 기본 씨앗을 보충하는 개발 도구도 있다. 자세한 내용은 [development-seed-refill.md](./development-seed-refill.md) 참고.
+
 ## 사용 방법
 
 1. `pet-rock` 디렉터리에서 `npm run dev`를 실행한다.

@@ -1,11 +1,12 @@
 import { useState } from 'react'
 
-import { useGameActions, useGameQueries } from '../app/index'
+import { useDevGameActions, useGameActions, useGameQueries } from '../app/index'
 import {
   DEVELOPMENT_GROWTH_TARGETS,
   type DevelopmentClock,
   type DevelopmentGrowthTarget,
 } from './growth-clock'
+import { DEVELOPMENT_SEED_REFILL_AMOUNT } from './seed-refill'
 
 const DEVELOPMENT_CLOCK_STYLES = `
 .development-clock { position: fixed; z-index: 1000; top: max(8px, env(safe-area-inset-top)); right: 8px; color: #342d20; font: 12px/1.4 system-ui, sans-serif; }
@@ -17,6 +18,9 @@ const DEVELOPMENT_CLOCK_STYLES = `
 .development-clock__targets { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
 .development-clock__targets button { padding: 7px; }
 .development-clock__panel small { display: block; margin-top: 8px; }
+.development-clock__seeds { margin-top: 12px; padding-top: 10px; border-top: 1px solid #e4d6a3; }
+.development-clock__seeds button { width: 100%; padding: 7px; margin-top: 6px; }
+.development-clock__seeds-error { color: #a12b2b; }
 `
 
 type DevelopmentGrowthClockProps = Readonly<{
@@ -33,8 +37,11 @@ function formatElapsed(elapsedMs: number): string {
 export function DevelopmentGrowthClock({ clock }: DevelopmentGrowthClockProps) {
   const { gameState } = useGameQueries()
   const actions = useGameActions()
+  const devActions = useDevGameActions()
   const [open, setOpen] = useState(false)
   const [pendingTarget, setPendingTarget] = useState<string | null>(null)
+  const [seedRefillPending, setSeedRefillPending] = useState(false)
+  const [seedRefillError, setSeedRefillError] = useState<string | null>(null)
   const growingPlant = gameState?.plantGrowth ?? null
   const growthElapsed =
     growingPlant === null ? null : clock.now() - growingPlant.plantedAt
@@ -49,6 +56,24 @@ export function DevelopmentGrowthClock({ clock }: DevelopmentGrowthClockProps) {
       await actions.refreshGrowth()
     }
     setPendingTarget(null)
+  }
+
+  async function refillSeeds() {
+    if (devActions === null || seedRefillPending) {
+      return
+    }
+
+    setSeedRefillPending(true)
+    const result = await devActions.refillSeeds()
+
+    if (!result.ok) {
+      console.error('[DEV] 씨앗 보충 저장 실패', result.error)
+      setSeedRefillError('씨앗 보충 저장에 실패했습니다. 기존 수량을 유지합니다.')
+    } else {
+      setSeedRefillError(null)
+    }
+
+    setSeedRefillPending(false)
   }
 
   return (
@@ -82,6 +107,26 @@ export function DevelopmentGrowthClock({ clock }: DevelopmentGrowthClockProps) {
               ))}
             </div>
             {growingPlant === null ? <small>먼저 씨앗을 심어주세요.</small> : null}
+            {devActions === null ? null : (
+              <div className="development-clock__seeds">
+                <strong>기본 씨앗 보충</strong>
+                <p>
+                  현재 보유: {gameState === null ? '-' : `${gameState.seeds.basic}개`}
+                </p>
+                <button
+                  type="button"
+                  disabled={gameState === null || seedRefillPending}
+                  onClick={() => void refillSeeds()}
+                >
+                  {seedRefillPending
+                    ? '보충 중…'
+                    : `기본 씨앗 +${DEVELOPMENT_SEED_REFILL_AMOUNT}개`}
+                </button>
+                {seedRefillError === null ? null : (
+                  <small className="development-clock__seeds-error">{seedRefillError}</small>
+                )}
+              </div>
+            )}
           </div>
         ) : null}
       </aside>

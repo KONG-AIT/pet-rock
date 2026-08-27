@@ -2,7 +2,13 @@ import { use, useMemo, useSyncExternalStore } from 'react'
 
 import { getGrowthView } from '../domain'
 import { AppSnapshotOverrideContext, AppStoreContext } from './context'
-import type { AppSnapshot, GameActions, GameQueries, AppNavigation } from './types'
+import type {
+  AppSnapshot,
+  GameActions,
+  GameQueries,
+  AppNavigation,
+  DevGameActions,
+} from './types'
 
 function useAppStore() {
   const store = use(AppStoreContext)
@@ -43,4 +49,8 @@ export function useGameActions(): GameActions {
 
 export function useAppNavigation(): AppNavigation {
   return useAppStore().navigation
+}
+
+export function useDevGameActions(): DevGameActions | null {
+  return useAppStore().devActions
 }

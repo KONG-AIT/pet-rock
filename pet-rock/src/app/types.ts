@@ -62,3 +62,7 @@ export interface GameActions {
 export interface AppNavigation {
   navigate(command: NavigationCommand): boolean
 }
+
+export interface DevGameActions {
+  refillSeeds(): Promise<AppActionResult>
+}

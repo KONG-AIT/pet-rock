@@ -9,6 +9,7 @@ import {
   type GameState,
   type Result,
 } from '../domain'
+import { DEVELOPMENT_SEED_REFILL_AMOUNT } from '../dev/seed-refill'
 import type { GameStorage, StorageError, StorageResult } from '../storage'
 import { APP_ROUTES } from './routes'
 import { createAppStore } from './store'
@@ -377,5 +378,80 @@ describe('game actions', () => {
     expect(snapshot.gameState?.ownedPlants).toEqual(['plant-02'])
     expect(snapshot.gameState?.equipment).toEqual({ status: 'unequipped' })
     expect(storage.state).toEqual(snapshot.gameState)
+  })
+})
+
+describe('development seed refill', () => {
+  it('exposes the refill action in a development build', async () => {
+    const app = store(new RecordingStorage(initialState()))
+    await app.initialize()
+
+    expect(app.devActions).not.toBeNull()
+  })
+
+  it('adds the fixed refill amount without changing growth, plants, or equipment', async () => {
+    const planted = unwrap(plantSeed(initialState(), ADOPTED_AT, () => 'plant-01'))
+    const storage = new RecordingStorage(planted)
+    const app = store(storage)
+    await app.initialize()
+
+    expect(await app.devActions?.refillSeeds()).toEqual({ ok: true, value: undefined })
+
+    const snapshot = app.getSnapshot()
+    expect(snapshot.gameState?.seeds.basic).toBe(
+      planted.seeds.basic + DEVELOPMENT_SEED_REFILL_AMOUNT,
+    )
+    expect(snapshot.gameState?.plantGrowth).toEqual(planted.plantGrowth)
+    expect(snapshot.gameState?.ownedPlants).toEqual(planted.ownedPlants)
+    expect(snapshot.gameState?.equipment).toEqual(planted.equipment)
+    expect(snapshot.route).toBe(APP_ROUTES.home)
+    expect(storage.state).toEqual(snapshot.gameState)
+  })
+
+  it('refills after every basic seed has been used, unblocking further planting', async () => {
+    const emptied: GameState = { ...initialState(), seeds: { basic: 0 } }
+    const storage = new RecordingStorage(emptied)
+    const app = store(storage)
+    await app.initialize()
+
+    expect(await app.devActions?.refillSeeds()).toEqual({ ok: true, value: undefined })
+
+    expect(app.getSnapshot().gameState?.seeds.basic).toBe(DEVELOPMENT_SEED_REFILL_AMOUNT)
+    expect(await app.actions.plantSeed()).toEqual({ ok: true, value: undefined })
+  })
+
+  it('keeps the existing seed count when the refill cannot be saved', async () => {
+    const original = initialState()
+    const storage = new RecordingStorage(original)
+    const app = store(storage)
+    await app.initialize()
+    const before = app.getSnapshot()
+    storage.saveError = { code: 'write_failed' }
+
+    expect(await app.devActions?.refillSeeds()).toEqual({
+      ok: false,
+      error: { source: 'storage', error: { code: 'write_failed' } },
+    })
+    expect(app.getSnapshot()).toBe(before)
+    expect(storage.state).toBe(original)
+  })
+
+  it('serializes rapid repeated refills instead of losing an update', async () => {
+    const storage = new RecordingStorage(initialState())
+    const app = store(storage)
+    await app.initialize()
+    const startingCount = app.getSnapshot().gameState?.seeds.basic ?? 0
+
+    const [first, second] = await Promise.all([
+      app.devActions?.refillSeeds(),
+      app.devActions?.refillSeeds(),
+    ])
+
+    expect(first).toEqual({ ok: true, value: undefined })
+    expect(second).toEqual({ ok: true, value: undefined })
+    expect(storage.saves).toHaveLength(2)
+    expect(app.getSnapshot().gameState?.seeds.basic).toBe(
+      startingCount + DEVELOPMENT_SEED_REFILL_AMOUNT * 2,
+    )
   })
 })
