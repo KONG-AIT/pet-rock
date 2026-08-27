@@ -130,22 +130,38 @@ describe('S03 seed planting view states', () => {
       ).toBeNull()
     })
 
-    it('targets the planted-to-growing stage boundary while still planted', () => {
+    it('targets just after the planted-to-growing stage boundary while still planted', () => {
       const planted = unwrap(plantSeed(initialState(), ADOPTED_AT, () => 'plant-02'))
       const observedAt = ADOPTED_AT + 60 * 60 * 1_000
 
-      expect(getGrowthPollDelayMs(getGrowthView(planted, observedAt), observedAt)).toBe(
-        2 * 60 * 60 * 1_000,
-      )
+      const delay = getGrowthPollDelayMs(getGrowthView(planted, observedAt), observedAt)
+
+      expect(delay).toBeGreaterThan(2 * 60 * 60 * 1_000)
+      expect(delay).toBeLessThanOrEqual(2 * 60 * 60 * 1_000 + 1_000)
     })
 
-    it('targets the completion boundary once the growing stage has started', () => {
+    it('targets just after the completion boundary once the growing stage has started', () => {
       const planted = unwrap(plantSeed(initialState(), ADOPTED_AT, () => 'plant-02'))
       const observedAt = ADOPTED_AT + 4 * 60 * 60 * 1_000
 
-      expect(getGrowthPollDelayMs(getGrowthView(planted, observedAt), observedAt)).toBe(
-        2 * 60 * 60 * 1_000,
-      )
+      const delay = getGrowthPollDelayMs(getGrowthView(planted, observedAt), observedAt)
+
+      expect(delay).toBeGreaterThan(2 * 60 * 60 * 1_000)
+      expect(delay).toBeLessThanOrEqual(2 * 60 * 60 * 1_000 + 1_000)
+    })
+
+    it('does not schedule the refresh on the wrong side of a one-millisecond boundary', () => {
+      const planted = unwrap(plantSeed(initialState(), ADOPTED_AT, () => 'plant-02'))
+      const observedAt = ADOPTED_AT + SIX_HOURS - 1
+
+      const delay = getGrowthPollDelayMs(getGrowthView(planted, observedAt), observedAt)
+
+      expect(delay).not.toBeNull()
+      const completed = completePlantGrowth(planted, observedAt + delay!)
+
+      expect(delay).toBeGreaterThan(1)
+      expect(delay).toBeLessThanOrEqual(1_000)
+      expect(completed.ok).toBe(true)
     })
 
     it('never returns a negative delay when a boundary has already passed', () => {
