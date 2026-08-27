@@ -152,7 +152,7 @@ describe('S04 plant storage view', () => {
     expect(html).toContain('씨앗')
     expect(html).toContain('없음')
     expect(html).toContain('장착 중')
-    expect(html).toContain('미리보기')
+    expect(html).toContain('미리보기 선택')
     expect(html).toContain('미획득')
     expect(html).toContain('머리에 심기')
     expect(html).toContain('disabled=""')
@@ -178,29 +178,10 @@ describe('S04 plant storage view', () => {
       /data-selected="false" data-equipped="true"[^>]*>[\s\S]*?식물 1[\s\S]*?plant-card__equipped-badge">장착 중/,
     )
     expect(html).toMatch(
-      /data-selected="true" data-equipped="false"[^>]*>[\s\S]*?식물 2[\s\S]*?plant-card__preview-badge" data-active="true"[^>]*>미리보기/,
+      /data-selected="true" data-equipped="false"[^>]*>[\s\S]*?식물 2/,
     )
     expect(html.match(/plant-card__equipped-badge/g)).toHaveLength(1)
-    expect(html.match(/plant-card__preview-badge" data-active="true"/g)).toHaveLength(1)
-  })
-
-  it('always reserves the preview badge slot so card height stays constant', () => {
-    const html = renderToStaticMarkup(
-      <PlantStorageView
-        {...callbacks}
-        state={gameState({
-          ownedPlants: ['plant-01', 'plant-02'],
-          equipment: { status: 'equipped', plantId: 'plant-01' },
-        })}
-        activeTab="plants"
-        previewPlantId="plant-02"
-        pending={false}
-        errorMessage={null}
-      />,
-    )
-
-    expect(html.match(/plant-card__preview-badge"/g)).toHaveLength(3)
-    expect(html.match(/plant-card__preview-badge" data-active="false"/g)).toHaveLength(2)
+    expect(html).not.toContain('plant-card__preview-badge')
   })
 
   it('uses the same equipment and preview indicators for the none card', () => {
@@ -232,9 +213,8 @@ describe('S04 plant storage view', () => {
       /plant-card--none" data-selected="false" data-equipped="true"[^>]*>[\s\S]*?장착 중/,
     )
     expect(previewNone).toMatch(
-      /plant-card--none" data-selected="true" data-equipped="false"[^>]*>[\s\S]*?plant-card__preview-badge" data-active="true"[^>]*>미리보기/,
+      /plant-card--none" data-selected="true" data-equipped="false"/,
     )
-    expect(equippedNone.match(/plant-card--none[\s\S]*?plant-card__preview-badge" data-active="false"/)).not.toBeNull()
   })
 
   it('renders one aggregated seed card and its planting action', () => {

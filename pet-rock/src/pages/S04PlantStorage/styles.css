@@ -4,7 +4,6 @@
   --storage-green: #3f7650;
   --storage-green-deep: #2e5e3c;
   --storage-green-soft: #e9f2e9;
-  --storage-preview: #9a6428;
   --storage-preview-soft: #fff8e8;
   --storage-paper: #fbfaf4;
   --storage-line: #dde3da;
@@ -454,25 +453,6 @@ button.plant-card {
   font-size: 9px;
   font-weight: 900;
   letter-spacing: 0.05em;
-}
-
-.plant-card__preview-badge {
-  display: inline-flex;
-  min-height: 19px;
-  padding: 2px 7px;
-  align-items: center;
-  border: 1px solid rgba(154, 100, 40, 0.28);
-  border-radius: 999px;
-  color: var(--storage-preview);
-  background: rgba(255, 255, 255, 0.72);
-  font-size: 9px;
-  font-weight: 900;
-  letter-spacing: 0.04em;
-  visibility: hidden;
-}
-
-.plant-card__preview-badge[data-active='true'] {
-  visibility: visible;
 }
 
 .plant-card--none .storage-rock {
