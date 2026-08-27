@@ -154,6 +154,7 @@ describe('whole game flow integration', () => {
   it.each<ShareResult>([
     { status: 'shared' },
     { status: 'cancelled' },
+    { status: 'unavailable' },
     { status: 'failed' },
   ])('keeps home and saved game state after share result $status', async (shareResult) => {
     const state = unwrap(

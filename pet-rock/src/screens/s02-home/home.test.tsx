@@ -4,11 +4,14 @@ import { describe, expect, it, vi } from 'vitest'
 import type { GameState, GrowthView, Result } from '../../domain'
 import { HomeView } from './HomeView'
 import {
+  createHomeShareNotice,
   createHomeRenderModel,
   nextMenuOpenState,
   requestHomeMenuAction,
   type HomeRenderModel,
+  type HomeShareNotice,
 } from './home-model'
+import { requestRockShareOnce } from './home-share'
 
 const state: GameState = {
   rock: { id: 'rock-02', name: '몽돌' as GameState['rock']['name'], adoptedAt: 1_000 },
@@ -20,13 +23,20 @@ const state: GameState = {
 
 const noOp = () => undefined
 
-function renderHome(model: HomeRenderModel, menuOpen = false) {
+function renderHome(
+  model: HomeRenderModel,
+  menuOpen = false,
+  sharePending = false,
+  shareNotice: HomeShareNotice = null,
+) {
   return renderToStaticMarkup(
     <HomeView
       model={model}
       menuOpen={menuOpen}
       reacting={false}
       reactionKey={0}
+      shareNotice={shareNotice}
+      sharePending={sharePending}
       onRockTouch={noOp}
       onToggleMenu={noOp}
       onDismissMenu={noOp}
@@ -108,5 +118,59 @@ describe('S02 action menu behavior', () => {
     expect(requestHomeMenuAction('share', { navigate }, share)).toBe(true)
     expect(share).toHaveBeenCalledOnce()
     expect(navigate).not.toHaveBeenCalled()
+  })
+
+  it.each([
+    [{ status: 'shared' }, '공유 창을 열었어요.'],
+    [{ status: 'unavailable' }, '이 환경에서는 공유 기능을 지원하지 않아요.'],
+    [{ status: 'failed' }, '공유하지 못했어요. 잠시 후 다시 시도해주세요.'],
+  ] as const)('creates short feedback for $status', (result, message) => {
+    expect(createHomeShareNotice(result)?.message).toBe(message)
+  })
+
+  it('keeps cancellation quiet', () => {
+    expect(createHomeShareNotice({ status: 'cancelled' })).toBeNull()
+  })
+
+  it('renders progress and result feedback without adding another screen', () => {
+    const model = createHomeRenderModel(state, null)
+    const pending = renderHome(model, true, true)
+    const failed = renderHome(
+      model,
+      false,
+      false,
+      createHomeShareNotice({ status: 'failed' }),
+    )
+
+    expect(pending).toContain('공유를 준비하고 있어요.')
+    expect(pending).toContain('disabled=""')
+    expect(failed).toContain('공유하지 못했어요. 잠시 후 다시 시도해주세요.')
+    expect(failed).toContain('data-screen="s02-home"')
+  })
+
+  it('prevents duplicate share requests while one is in progress', async () => {
+    let finishShare: ((value: { status: 'shared' }) => void) | undefined
+    const share = vi.fn(() => new Promise<{ status: 'shared' }>((resolve) => {
+      finishShare = resolve
+    }))
+    const inFlight = { current: false }
+
+    const first = requestRockShareOnce(state, { share }, inFlight)
+    await expect(requestRockShareOnce(state, { share }, inFlight)).resolves.toBeNull()
+    expect(share).toHaveBeenCalledOnce()
+
+    finishShare?.({ status: 'shared' })
+    await expect(first).resolves.toEqual({ status: 'shared' })
+    expect(inFlight.current).toBe(false)
+  })
+
+  it('maps an unexpected service rejection to failed and allows retrying', async () => {
+    const inFlight = { current: false }
+    const share = vi.fn().mockRejectedValueOnce(new Error('unexpected'))
+
+    await expect(requestRockShareOnce(state, { share }, inFlight)).resolves.toEqual({
+      status: 'failed',
+    })
+    expect(inFlight.current).toBe(false)
   })
 })

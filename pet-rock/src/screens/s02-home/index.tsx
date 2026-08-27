@@ -7,16 +7,17 @@ import {
 } from '../../app/index'
 import {
   createDefaultRockShareService,
-  shareRock,
   type RockShareService,
 } from '../../share'
 import { HomeView } from './HomeView'
 import {
+  createHomeShareNotice,
   createHomeRenderModel,
   nextMenuOpenState,
   requestHomeMenuAction,
   type HomeMenuAction,
 } from './home-model'
+import { requestRockShareOnce } from './home-share'
 import './styles.css'
 
 export type HomeScreenProps = Readonly<{
@@ -31,7 +32,11 @@ export function HomeScreen({
   const [menuOpen, setMenuOpen] = useState(false)
   const [reacting, setReacting] = useState(false)
   const [reactionKey, setReactionKey] = useState(0)
+  const [sharePending, setSharePending] = useState(false)
+  const [shareNotice, setShareNotice] = useState<ReturnType<typeof createHomeShareNotice>>(null)
   const reactionTimer = useRef<number | null>(null)
+  const shareNoticeTimer = useRef<number | null>(null)
+  const shareInFlight = useRef(false)
   const menuHistoryEntry = useTransientHistoryEntry(
     'petRockS02ActionMenu',
     () => setMenuOpen(nextMenuOpenState(true, 'system-back')),
@@ -41,6 +46,9 @@ export function HomeScreen({
     () => () => {
       if (reactionTimer.current !== null) {
         window.clearTimeout(reactionTimer.current)
+      }
+      if (shareNoticeTimer.current !== null) {
+        window.clearTimeout(shareNoticeTimer.current)
       }
     },
     [],
@@ -75,11 +83,55 @@ export function HomeScreen({
   }
 
   function selectMenuAction(action: HomeMenuAction) {
-    unwindMenuHistory()
     setMenuOpen(nextMenuOpenState(menuOpen, 'selection'))
+
+    if (action === 'share') {
+      // Start the share call before traversing history so browser user activation is preserved.
+      requestHomeMenuAction(action, navigation, () => {
+        void performShare()
+      })
+      unwindMenuHistory()
+      return
+    }
+
+    unwindMenuHistory()
     requestHomeMenuAction(action, navigation, () => {
-      void shareRock(currentGameState, shareService)
+      void performShare()
     })
+  }
+
+  async function performShare() {
+    if (shareInFlight.current) {
+      return
+    }
+
+    if (shareNoticeTimer.current !== null) {
+      window.clearTimeout(shareNoticeTimer.current)
+      shareNoticeTimer.current = null
+    }
+
+    setShareNotice(null)
+    setSharePending(true)
+    const result = await requestRockShareOnce(
+      currentGameState,
+      shareService,
+      shareInFlight,
+    )
+    setSharePending(false)
+
+    if (result === null) {
+      return
+    }
+
+    const notice = createHomeShareNotice(result)
+    setShareNotice(notice)
+
+    if (notice !== null) {
+      shareNoticeTimer.current = window.setTimeout(() => {
+        setShareNotice(null)
+        shareNoticeTimer.current = null
+      }, notice.tone === 'error' ? 4_000 : 2_500)
+    }
   }
 
   function touchRock() {
@@ -101,6 +153,8 @@ export function HomeScreen({
       menuOpen={menuOpen}
       reacting={reacting}
       reactionKey={reactionKey}
+      shareNotice={shareNotice}
+      sharePending={sharePending}
       onRockTouch={touchRock}
       onToggleMenu={toggleMenu}
       onDismissMenu={dismissMenu}

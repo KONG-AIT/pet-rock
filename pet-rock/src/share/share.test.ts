@@ -7,6 +7,7 @@ import {
   createRockShareModel,
   createRockShareService,
   createRockShareText,
+  isAppsInTossRuntime,
   shareRock,
   type AppsInTossShareApi,
   type RockShareService,
@@ -123,9 +124,26 @@ describe('browser fallback', () => {
     await expect(createBrowserShareService({ share: vi.fn() }, undefined).share(model))
       .resolves.toEqual({ status: 'unavailable' })
   })
+
+  it('returns unavailable outside a secure context', async () => {
+    const share = vi.fn()
+
+    await expect(
+      createBrowserShareService({ share }, 'http://example.com', false).share(
+        createRockShareModel(gameState()),
+      ),
+    ).resolves.toEqual({ status: 'unavailable' })
+    expect(share).not.toHaveBeenCalled()
+  })
 })
 
 describe('share service routing', () => {
+  it('detects Apps in Toss and Sandbox by the native bridge', () => {
+    expect(isAppsInTossRuntime({ ReactNativeWebView: {} })).toBe(true)
+    expect(isAppsInTossRuntime({})).toBe(false)
+    expect(isAppsInTossRuntime(undefined)).toBe(false)
+  })
+
   it('uses only the adapter selected for the runtime', async () => {
     const appsInToss = serviceReturning({ status: 'shared' })
     const browser = serviceReturning({ status: 'unavailable' })
@@ -136,6 +154,18 @@ describe('share service routing', () => {
     ).resolves.toEqual({ status: 'shared' })
     expect(appsInToss.share).toHaveBeenCalledWith(model)
     expect(browser.share).not.toHaveBeenCalled()
+  })
+
+  it('uses the browser adapter outside Apps in Toss', async () => {
+    const appsInToss = serviceReturning({ status: 'failed' })
+    const browser = serviceReturning({ status: 'shared' })
+    const model = createRockShareModel(gameState())
+
+    await expect(
+      createRockShareService({ isAppsInToss: false, appsInToss, browser }).share(model),
+    ).resolves.toEqual({ status: 'shared' })
+    expect(browser.share).toHaveBeenCalledWith(model)
+    expect(appsInToss.share).not.toHaveBeenCalled()
   })
 
   it.each([

@@ -4,6 +4,10 @@ export { createBrowserShareService } from './browser'
 export type { BrowserShareApi } from './browser'
 export { createRockShareModel, createRockShareText } from './model'
 export { shareRock } from './share-rock'
-export { createDefaultRockShareService, createRockShareService } from './service'
+export {
+  createDefaultRockShareService,
+  createRockShareService,
+  isAppsInTossRuntime,
+} from './service'
 export type { RockShareRuntime } from './service'
 export type { RockShareModel, RockShareService, ShareResult } from './types'

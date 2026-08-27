@@ -1,11 +1,13 @@
 import { HomeRockVisual } from '../../components/visuals'
-import type { HomeMenuAction, HomeRenderModel } from './home-model'
+import type { HomeMenuAction, HomeRenderModel, HomeShareNotice } from './home-model'
 
 type HomeViewProps = Readonly<{
   model: HomeRenderModel
   menuOpen: boolean
   reacting: boolean
   reactionKey: number
+  shareNotice: HomeShareNotice
+  sharePending: boolean
   onRockTouch: () => void
   onToggleMenu: () => void
   onDismissMenu: () => void
@@ -27,6 +29,8 @@ export function HomeView({
   menuOpen,
   reacting,
   reactionKey,
+  shareNotice,
+  sharePending,
   onRockTouch,
   onToggleMenu,
   onDismissMenu,
@@ -85,8 +89,13 @@ export function HomeView({
               <span>식물 보관함</span>
               <MenuIcon action="plant-storage" />
             </button>
-            <button type="button" role="menuitem" onClick={() => onMenuAction('share')}>
-              <span>공유</span>
+            <button
+              disabled={sharePending}
+              type="button"
+              role="menuitem"
+              onClick={() => onMenuAction('share')}
+            >
+              <span>{sharePending ? '공유하는 중' : '공유'}</span>
               <MenuIcon action="share" />
             </button>
           </div>
@@ -104,6 +113,20 @@ export function HomeView({
           <span aria-hidden="true" />
         </button>
       </div>
+
+      {sharePending ? (
+        <p aria-live="polite" className="home__share-notice" role="status">
+          공유를 준비하고 있어요.
+        </p>
+      ) : shareNotice === null ? null : (
+        <p
+          aria-live="polite"
+          className={`home__share-notice home__share-notice--${shareNotice.tone}`}
+          role="status"
+        >
+          {shareNotice.message}
+        </p>
+      )}
     </main>
   )
 }
