@@ -10,6 +10,24 @@ function historyPort(state: unknown = null) {
   }
 }
 
+function stackedHistoryPort() {
+  const stack: unknown[] = [null]
+
+  return {
+    get state() {
+      return stack[stack.length - 1]
+    },
+    pushState: vi.fn((data: unknown) => {
+      stack.push(data)
+    }),
+    back: vi.fn(() => {
+      if (stack.length > 1) {
+        stack.pop()
+      }
+    }),
+  }
+}
+
 describe('transient history entry', () => {
   it('opens only one entry and preserves the current history state', () => {
     const history = historyPort({ existing: true })
@@ -44,5 +62,23 @@ describe('transient history entry', () => {
     expect(entry.consumePop()).toBe(false)
     expect(entry.close()).toBe(false)
     expect(history.back).not.toHaveBeenCalled()
+  })
+
+  it('ignores a pop consumed by a nested entry pushed on top of it', () => {
+    const history = stackedHistoryPort()
+    const outer = createTransientHistoryEntry(history, 'outer')
+    const inner = createTransientHistoryEntry(history, 'inner')
+
+    outer.open()
+    inner.open()
+
+    // Popping the top (inner) entry must not be claimed by the outer one.
+    history.back()
+    expect(outer.consumePop()).toBe(false)
+    expect(inner.consumePop()).toBe(true)
+
+    // The outer entry is still active and correctly claims its own pop.
+    history.back()
+    expect(outer.consumePop()).toBe(true)
   })
 })

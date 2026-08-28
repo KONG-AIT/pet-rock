@@ -42,6 +42,33 @@
   filter: brightness(0.94);
 }
 
+.app-exit-toast {
+  position: absolute;
+  z-index: 6;
+  left: 50%;
+  bottom: max(30px, calc(var(--app-safe-bottom) + 22px));
+  transform: translateX(-50%);
+  max-width: min(72vw, 360px);
+  margin: 0;
+  padding: 10px 15px;
+  border: 1px solid rgba(73, 69, 63, 0.1);
+  border-radius: 999px;
+  color: #3d3933;
+  background: rgba(251, 250, 246, 0.94);
+  box-shadow: 0 8px 22px rgba(61, 57, 51, 0.12);
+  font-size: 14px;
+  line-height: 1.4;
+  text-align: center;
+  pointer-events: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  .app-exit-toast {
+    color: #eeece6;
+    background: rgba(45, 46, 41, 0.95);
+  }
+}
+
 .app-router__status {
   display: grid;
   height: 100%;

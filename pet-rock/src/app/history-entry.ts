@@ -12,6 +12,15 @@ export type TransientHistoryEntry = Readonly<{
   consumePop(): boolean
 }>
 
+function ownsCurrentState(history: HistoryPort, stateKey: string): boolean {
+  const state = history.state
+  return (
+    typeof state === 'object' &&
+    state !== null &&
+    (state as Record<string, unknown>)[stateKey] === true
+  )
+}
+
 export function createTransientHistoryEntry(
   history: HistoryPort,
   stateKey: string,
@@ -43,7 +52,9 @@ export function createTransientHistoryEntry(
     },
 
     consumePop() {
-      if (!active) {
+      // A pop that still carries this entry's key belongs to another
+      // (nested) transient entry pushed on top of this one, not this one.
+      if (!active || ownsCurrentState(history, stateKey)) {
         return false
       }
 
