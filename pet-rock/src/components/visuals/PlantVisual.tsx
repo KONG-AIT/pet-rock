@@ -1,5 +1,11 @@
 import type { PlantId } from '../../domain'
 
+const STORAGE_PLANT_SHAPES: Readonly<Record<PlantId, 'sprout' | 'flower' | 'cactus'>> = {
+  'plant-01': 'sprout',
+  'plant-02': 'flower',
+  'plant-03': 'cactus',
+}
+
 export function EquippedPlantVisual({ plantId }: Readonly<{ plantId: PlantId }>) {
   if (plantId === 'plant-02') {
     return (
@@ -71,8 +77,14 @@ export function CompletedPlantVisual({ plantId }: Readonly<{ plantId: PlantId }>
 }
 
 export function StoragePlantVisual({ plantId }: Readonly<{ plantId: PlantId }>) {
+  const shape = STORAGE_PLANT_SHAPES[plantId]
+
   return (
-    <span className="storage-plant" data-plant={plantId} aria-hidden="true">
+    <span
+      className={`storage-plant storage-plant--${shape}`}
+      data-plant={plantId}
+      aria-hidden="true"
+    >
       <span className="storage-plant__stem" />
       <span className="storage-plant__leaf storage-plant__leaf--left" />
       <span className="storage-plant__leaf storage-plant__leaf--right" />

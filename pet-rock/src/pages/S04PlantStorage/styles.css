@@ -304,43 +304,51 @@
   box-shadow: 7px 2px 0 -1px #f0b0ad, -5px 4px 0 -1px #e68d93;
 }
 
-.storage-plant[data-plant='plant-01'] .storage-plant__bloom {
+.storage-plant--sprout .storage-plant__bloom {
   display: none;
 }
 
-.storage-plant[data-plant='plant-01'] .storage-plant__stem {
+.storage-plant--sprout .storage-plant__stem {
   height: 37px;
 }
 
-.storage-plant[data-plant='plant-02'] .storage-plant__bloom {
+.storage-plant--flower .storage-plant__bloom {
   border-color: #c39c43;
   background: #f7d67a;
   box-shadow: 7px 2px 0 -1px #f2c45f, -5px 4px 0 -1px #fae09a;
 }
 
-.storage-plant[data-plant='plant-03'] .storage-plant__stem {
-  left: 24px;
+.storage-plant--cactus .storage-plant__stem {
+  bottom: 3px;
+  left: 20px;
+  width: 22px;
+  height: 46px;
+  border: 2px solid #2f5a2a;
+  border-radius: 46% 46% 50% 50% / 20% 20% 8% 8%;
+  background: repeating-linear-gradient(90deg, #4f8a45 0 3px, #5c9950 3px 6px);
+}
+
+.storage-plant--cactus .storage-plant__leaf {
   width: 15px;
-  height: 54px;
-  border: 2px solid #47723d;
-  background: #729f61;
-}
-
-.storage-plant[data-plant='plant-03'] .storage-plant__leaf {
-  width: 14px;
-  height: 8px;
-  border-width: 1px;
-}
-
-.storage-plant[data-plant='plant-03'] .storage-plant__bloom {
-  top: 0;
-  left: 19px;
-  width: 25px;
-  height: 13px;
-  border: 0;
+  height: 12px;
+  border: 2px solid #2f5a2a;
   border-radius: 50%;
-  background: #7daa6d;
-  box-shadow: none;
+  background: #5c9950;
+  transform: none;
+}
+
+.storage-plant--cactus .storage-plant__leaf--left {
+  bottom: 25px;
+  left: 4px;
+}
+
+.storage-plant--cactus .storage-plant__leaf--right {
+  right: 3px;
+  bottom: 33px;
+}
+
+.storage-plant--cactus .storage-plant__bloom {
+  display: none;
 }
 
 .storage-preview h2 {
