@@ -255,7 +255,7 @@ export function S03SeedPlantingPage() {
 
     if (result.ok) {
       if (pending === 'store') {
-        setFeedbackMessage('보관했어요. 이어서 씨앗을 심을 수 있어요.')
+        setFeedbackMessage('보관함에 저장했어요.')
       }
       return
     }
