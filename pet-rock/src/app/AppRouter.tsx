@@ -25,7 +25,7 @@ type AppRouterProps = Readonly<{
 const ROUTE_LABELS: Readonly<Record<AppRoute, string>> = {
   [APP_ROUTES.rockSelection]: '돌 선택',
   [APP_ROUTES.home]: '홈',
-  [APP_ROUTES.planting]: '씨앗 심기',
+  [APP_ROUTES.planting]: '내 정원',
   [APP_ROUTES.plantStorage]: '식물 보관함',
 }
 

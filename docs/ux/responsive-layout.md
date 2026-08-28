@@ -23,7 +23,7 @@ S01~S04가 Apps in Toss 모바일 viewport에서 같은 높이, safe area, scrol
 * S01/S02는 기본 상태에서 scroll range가 생기지 않아야 해요.
 * S01 목록은 text zoom처럼 실제 콘텐츠가 넘칠 때만 화면 내부에서 스크롤해요. 이름 입력 Overlay는 키보드로 동적 viewport가 줄어들면 panel 내부만 스크롤해 입력값과 `데려가기`에 접근할 수 있어요.
 * S03는 header를 유지하고 상태 콘텐츠 영역만 실제 overflow가 있을 때 스크롤해요.
-* S04는 header와 tab을 유지하고 현재 tab panel만 스크롤해요. 적용 action은 화면에 고정하고 Grid의 마지막 항목이 action 아래에 가려지지 않게 해요.
+* S04는 header를 유지하고 콘텐츠 영역만 스크롤해요. 적용 action은 화면에 고정하고 Grid의 마지막 항목이 action 아래에 가려지지 않게 해요.
 * 모든 scroll 영역은 overscroll을 route 내부에 가두며, scrollbar가 필요한 상태로 바뀌어도 해당 영역의 gutter가 갑자기 바뀌지 않게 해요.
 
 ### Route transition과 접근성
@@ -42,7 +42,7 @@ S01~S04가 Apps in Toss 모바일 viewport에서 같은 높이, safe area, scrol
 | S02 action menu / 공유 notice | 홈 높이와 scroll range 유지 | menu는 action 위로 펼치고 notice는 하단에서 접근 | action과 notice 모두 bottom inset 반영 |
 | S03 씨앗 없음 / 심기 전 | header 고정, 콘텐츠가 맞으면 scroll 없음 | 상태 콘텐츠 영역만 overflow scroll | header와 상태 하단에 top/bottom inset 반영 |
 | S03 성장 중 / 완료 | 주요 시각 요소와 action을 같은 콘텐츠 영역에 유지 | 완료 action까지 상태 콘텐츠 영역에서 접근 | Back은 top inset 아래 최소 44px target 유지 |
-| S04 식물 / 씨앗 / 빈 상태 | header와 tab 고정, panel만 필요할 때 scroll | panel 내부에서 마지막 항목까지 접근 | panel padding이 bottom inset 반영 |
+| S04 식물 / 빈 상태 | header 고정, 콘텐츠 영역만 필요할 때 scroll | 콘텐츠 영역 내부에서 마지막 항목까지 접근 | 콘텐츠 padding이 bottom inset 반영 |
 | S04 Preview / apply action | Preview 선택이 page 높이를 바꾸지 않음 | Grid만 scroll, apply action은 화면에 유지 | 마지막 Grid 항목 아래 action 높이 + inset 여백 확보 |
 | route transition | document scrollbar 없음 | arriving/departing 화면 모두 shell에 clip | 두 화면의 fixed 성격 요소가 각 route 안에 유지 |
 

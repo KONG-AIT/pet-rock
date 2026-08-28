@@ -264,7 +264,7 @@ export function S03SeedPlantingPage() {
             <path d="m15 5-7 7 7 7" />
           </svg>
         </button>
-        <h1>씨앗 심기</h1>
+        <h1>내 정원</h1>
       </header>
       <SeedPlantingContent
         key={viewStateMotionKey(viewState)}

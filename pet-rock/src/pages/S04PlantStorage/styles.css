@@ -49,7 +49,6 @@
 .plant-storage__header p,
 .plant-storage__section-heading p,
 .storage-preview__eyebrow,
-.seed-card__content p,
 .plant-storage__apply p {
   margin: 0;
   color: var(--storage-muted);
@@ -86,62 +85,11 @@
   outline-offset: 3px;
 }
 
-.plant-storage__tabs {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 6px;
-  flex: 0 0 auto;
-  margin-bottom: 24px;
-  padding: 5px;
-  border: 1px solid var(--storage-line);
-  border-radius: 16px;
-  background: #f0f1ec;
-}
-
-.plant-storage__tabs button {
-  display: flex;
-  min-height: 46px;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  border: 0;
-  border-radius: 11px;
-  color: var(--storage-muted);
-  background: transparent;
-  font-weight: 800;
-  cursor: pointer;
-}
-
-.plant-storage__tabs button span {
-  display: inline-grid;
-  min-width: 22px;
-  height: 22px;
-  padding: 0 6px;
-  place-items: center;
-  border-radius: 999px;
-  background: rgba(38, 51, 42, 0.08);
-  font-size: 11px;
-}
-
-.plant-storage__tabs button[aria-selected='true'] {
-  color: #fff;
-  background: var(--storage-green);
-  box-shadow: 0 6px 16px rgba(48, 92, 59, 0.18);
-}
-
-.plant-storage__tabs button[aria-selected='true'] span {
-  background: rgba(255, 255, 255, 0.18);
-}
-
-#plants-panel,
-#seeds-panel {
+.plant-storage__panel {
   display: flex;
   min-height: 0;
   flex: 1;
   flex-direction: column;
-}
-
-.plant-storage__panel {
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior-y: contain;
@@ -365,8 +313,7 @@
   font-weight: 700;
 }
 
-.plant-storage__collection,
-.plant-storage__seeds {
+.plant-storage__collection {
   margin-top: 28px;
 }
 
@@ -521,8 +468,7 @@ button.plant-card {
   font-size: 15px;
 }
 
-.plant-storage__apply button,
-.seed-card > button {
+.plant-storage__apply button {
   min-height: 50px;
   border: 0;
   border-radius: 14px;
@@ -536,87 +482,6 @@ button.plant-card {
   color: #929a92;
   background: #e1e4de;
   cursor: default;
-}
-
-.plant-storage__seeds {
-  margin-top: 32px;
-}
-
-.seed-card {
-  position: relative;
-  display: grid;
-  padding: 25px 22px;
-  grid-template-columns: 102px 1fr;
-  gap: 18px;
-  overflow: hidden;
-  border: 1px solid #d8e0d4;
-  border-radius: 25px;
-  background: linear-gradient(145deg, #edf4e8, #fffdf4);
-}
-
-.seed-card__visual {
-  position: relative;
-  display: grid;
-  min-height: 116px;
-  place-items: center;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.56);
-}
-
-.storage-seed-icon {
-  display: inline-block;
-  width: 39px;
-  height: 54px;
-  border: 2px solid #606a54;
-  border-radius: 70% 30% 65% 35% / 61% 35% 65% 39%;
-  background: linear-gradient(145deg, #a4a98a, #747b63);
-  box-shadow: inset 7px 5px 0 rgba(255, 255, 255, 0.14), 0 7px 13px rgba(55, 67, 51, 0.15);
-  transform: rotate(20deg);
-}
-
-.seed-card__spark {
-  position: absolute;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #7fa067;
-}
-
-.seed-card__spark--one {
-  top: 26px;
-  right: 24px;
-}
-
-.seed-card__spark--two {
-  bottom: 29px;
-  left: 23px;
-  width: 4px;
-  height: 4px;
-}
-
-.seed-card__content {
-  align-self: center;
-}
-
-.seed-card__content h2 {
-  margin: 3px 0 5px;
-  color: var(--storage-ink);
-  font-size: 23px;
-  font-weight: 850;
-}
-
-.seed-card__content strong {
-  color: var(--storage-green-deep);
-  font-size: 30px;
-  letter-spacing: -0.04em;
-}
-
-.seed-card > button {
-  display: flex;
-  grid-column: 1 / -1;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
 }
 
 .storage-empty {
@@ -710,26 +575,9 @@ button.plant-card {
   .plant-card {
     min-height: 122px;
   }
-
-  .seed-card {
-    grid-template-columns: 88px 1fr;
-    padding-inline: 17px;
-  }
-
-  .seed-card__content h2 {
-    font-size: 20px;
-  }
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  #plants-panel {
-    animation: storage-panel-enter-from-left 200ms cubic-bezier(0.22, 0.72, 0.24, 1) both;
-  }
-
-  #seeds-panel {
-    animation: storage-panel-enter-from-right 200ms cubic-bezier(0.22, 0.72, 0.24, 1) both;
-  }
-
   .storage-preview__plant {
     animation: storage-plant-sway 4.2s ease-in-out infinite;
     transform-origin: bottom center;
@@ -740,43 +588,19 @@ button.plant-card {
     transform-origin: bottom center;
   }
 
-  .plant-storage__tabs button,
   .plant-storage__apply button {
     transition: border-color 160ms ease, background-color 160ms ease, box-shadow 160ms ease,
       transform 160ms ease;
   }
 
-  .seed-card > button:hover,
   .storage-secondary-action:hover {
     transform: translateY(-2px);
   }
 
-  .plant-storage__tabs button:active,
   .plant-storage__apply button:not(:disabled):active,
-  .seed-card > button:active,
   .storage-secondary-action:active,
   .plant-storage__back:active {
     transform: scale(0.97);
-  }
-}
-
-@keyframes storage-panel-enter-from-left {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes storage-panel-enter-from-right {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
   }
 }
 

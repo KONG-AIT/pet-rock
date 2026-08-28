@@ -27,7 +27,6 @@ function gameState(overrides: Partial<GameState> = {}): GameState {
 
 const callbacks = {
   onBack: () => undefined,
-  onTabChange: () => undefined,
   onPreviewChange: () => undefined,
   onApply: () => undefined,
   onOpenPlanting: () => undefined,
@@ -120,36 +119,27 @@ describe('S04 plant storage model', () => {
     expect(hasPendingEquipmentChange('plant-01', null)).toBe(true)
     expect(hasPendingEquipmentChange(null, null)).toBe(false)
   })
-
-  it('uses the actual basic seed quantity from GameState', () => {
-    const model = createPlantStorageViewModel(gameState({ seeds: { basic: 7 } }), null)
-
-    expect(model.seedCount).toBe(7)
-  })
 })
 
 describe('S04 plant storage view', () => {
-  it('renders plant and seed tabs with current equipment and locked plants', () => {
+  it('renders the plant collection with current equipment and locked plants', () => {
     const state = gameState({
       ownedPlants: ['plant-01'],
       equipment: { status: 'equipped', plantId: 'plant-01' },
-      seeds: { basic: 2 },
     })
 
     const html = renderToStaticMarkup(
       <PlantStorageView
         {...callbacks}
         state={state}
-        activeTab="plants"
         previewPlantId="plant-01"
         pending={false}
         errorMessage={null}
       />,
     )
 
-    expect(html).toContain('role="tablist"')
+    expect(html).not.toContain('role="tablist"')
     expect(html).toContain('식물')
-    expect(html).toContain('씨앗')
     expect(html).toContain('없음')
     expect(html).toContain('장착 중')
     expect(html).toContain('미리보기 선택')
@@ -167,7 +157,6 @@ describe('S04 plant storage view', () => {
           ownedPlants: ['plant-01', 'plant-02'],
           equipment: { status: 'equipped', plantId: 'plant-01' },
         })}
-        activeTab="plants"
         previewPlantId="plant-02"
         pending={false}
         errorMessage={null}
@@ -189,7 +178,6 @@ describe('S04 plant storage view', () => {
       <PlantStorageView
         {...callbacks}
         state={gameState({ ownedPlants: ['plant-01'], equipment: { status: 'unequipped' } })}
-        activeTab="plants"
         previewPlantId="plant-01"
         pending={false}
         errorMessage={null}
@@ -202,7 +190,6 @@ describe('S04 plant storage view', () => {
           ownedPlants: ['plant-01'],
           equipment: { status: 'equipped', plantId: 'plant-01' },
         })}
-        activeTab="plants"
         previewPlantId={null}
         pending={false}
         errorMessage={null}
@@ -227,7 +214,6 @@ describe('S04 plant storage view', () => {
       <PlantStorageView
         {...callbacks}
         state={state}
-        activeTab="plants"
         previewPlantId="plant-01"
         pending={false}
         errorMessage={null}
@@ -237,7 +223,6 @@ describe('S04 plant storage view', () => {
       <PlantStorageView
         {...callbacks}
         state={state}
-        activeTab="plants"
         previewPlantId="plant-02"
         pending={false}
         errorMessage={null}
@@ -247,7 +232,6 @@ describe('S04 plant storage view', () => {
       <PlantStorageView
         {...callbacks}
         state={state}
-        activeTab="plants"
         previewPlantId="plant-03"
         pending={false}
         errorMessage={null}
@@ -257,7 +241,6 @@ describe('S04 plant storage view', () => {
       <PlantStorageView
         {...callbacks}
         state={state}
-        activeTab="plants"
         previewPlantId={null}
         pending={false}
         errorMessage={null}
@@ -270,52 +253,21 @@ describe('S04 plant storage view', () => {
     expect(none).not.toContain('storage-preview__plant')
   })
 
-  it('renders one aggregated seed card and its planting action', () => {
+  it('shows the empty state with a link to planting when no plant is completed', () => {
     const html = renderToStaticMarkup(
       <PlantStorageView
         {...callbacks}
-        state={gameState({ seeds: { basic: 4 } })}
-        activeTab="seeds"
+        state={gameState({ ownedPlants: [] })}
         previewPlantId={null}
         pending={false}
         errorMessage={null}
       />,
     )
 
-    expect(html.match(/기본 씨앗/g)).toHaveLength(2)
-    expect(html).toContain('×4')
-    expect(html).toContain('심기')
-    expect(html).toContain('class="plant-storage__panel"')
+    expect(html).toContain('아직 보관함이 비어 있어요')
+    expect(html).toContain('씨앗 심으러 가기')
+    expect(html).not.toContain('가지고 있는 씨앗이 없어요')
     expect(html).not.toContain('plant-storage__panel--with-apply')
-  })
-
-  it('judges empty states independently for each tab', () => {
-    const plantsEmpty = renderToStaticMarkup(
-      <PlantStorageView
-        {...callbacks}
-        state={gameState({ ownedPlants: [], seeds: { basic: 3 } })}
-        activeTab="plants"
-        previewPlantId={null}
-        pending={false}
-        errorMessage={null}
-      />,
-    )
-    const seedsEmpty = renderToStaticMarkup(
-      <PlantStorageView
-        {...callbacks}
-        state={gameState({ ownedPlants: ['plant-01'], seeds: { basic: 0 } })}
-        activeTab="seeds"
-        previewPlantId={null}
-        pending={false}
-        errorMessage={null}
-      />,
-    )
-
-    expect(plantsEmpty).toContain('아직 보관함이 비어 있어요')
-    expect(plantsEmpty).not.toContain('가지고 있는 씨앗이 없어요')
-    expect(plantsEmpty).not.toContain('plant-storage__panel--with-apply')
-    expect(seedsEmpty).toContain('가지고 있는 씨앗이 없어요')
-    expect(seedsEmpty).not.toContain('아직 보관함이 비어 있어요')
   })
 })
 
@@ -395,8 +347,8 @@ describe('S04 storage and P03 navigation integration', () => {
     })
   })
 
-  it('opens S03 directly from the seed tab contract', async () => {
-    const { app } = appStore(gameState({ seeds: { basic: 3 } }))
+  it('opens S03 directly from the empty storage contract', async () => {
+    const { app } = appStore(gameState({ ownedPlants: [] }))
     await app.initialize()
     app.navigation.navigate('openPlantStorage')
 

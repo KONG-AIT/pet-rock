@@ -1,6 +1,5 @@
 import { PLANT_CATALOG, type GameState, type PlantId } from '../../domain'
 
-export type StorageTab = 'plants' | 'seeds'
 export type PreviewPlantId = PlantId | null
 
 export type PlantStorageItem = Readonly<{
@@ -13,7 +12,6 @@ export type PlantStorageItem = Readonly<{
 
 export type PlantStorageViewModel = Readonly<{
   completedPlantCount: number
-  seedCount: number
   currentPlantId: PreviewPlantId
   previewPlantId: PreviewPlantId
   plantItems: ReadonlyArray<PlantStorageItem>
@@ -32,7 +30,6 @@ export function createPlantStorageViewModel(
 
   return {
     completedPlantCount: state.ownedPlants.length,
-    seedCount: state.seeds.basic,
     currentPlantId,
     previewPlantId,
     plantItems: PLANT_CATALOG.map((plant) => {
