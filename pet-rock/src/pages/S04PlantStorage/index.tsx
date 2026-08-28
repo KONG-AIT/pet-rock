@@ -76,10 +76,7 @@ export function PlantStorageView({
         >
           <span aria-hidden="true">←</span>
         </button>
-        <div>
-          <p>완전히 자란 식물 모음</p>
-          <h1>식물 보관함</h1>
-        </div>
+        <h1>식물 보관함</h1>
       </header>
 
       <div
@@ -157,7 +154,6 @@ export function PlantStorageView({
 
             <footer className="plant-storage__apply">
               <div>
-                <p>미리보기 선택</p>
                 <strong>{plantName(model.previewPlantId)}</strong>
               </div>
               <button
