@@ -3,6 +3,7 @@ import { useEffect, useRef, useState, type ComponentType } from 'react'
 import { APP_ROUTES } from './routes'
 import { useAppSnapshot } from './hooks'
 import { AppSnapshotOverrideContext } from './context'
+import { useRouteBackNavigation } from './route-back-navigation'
 import {
   getRouteTransitionDirection,
   ROUTE_TRANSITION_DURATION_MS,
@@ -52,6 +53,7 @@ function prefersReducedMotion(): boolean {
 
 export function AppRouter({ screens }: AppRouterProps) {
   const snapshot = useAppSnapshot()
+  const { showExitConfirmation } = useRouteBackNavigation()
   const readyRoute = snapshot.status === 'ready' ? snapshot.route : null
   const currentViewRef = useRef<HTMLDivElement | null>(null)
   const [renderedSnapshot, setRenderedSnapshot] = useState<AppSnapshot>(snapshot)
@@ -135,6 +137,11 @@ export function AppRouter({ screens }: AppRouterProps) {
           <RouteScreen route={snapshot.route} screens={screens} />
         </AppSnapshotOverrideContext>
       </div>
+      {showExitConfirmation ? (
+        <p aria-live="polite" className="app-exit-toast" role="status">
+          한 번 더 누르면 앱이 종료돼요.
+        </p>
+      ) : null}
     </div>
   )
 }
