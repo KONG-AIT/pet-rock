@@ -82,7 +82,7 @@ export function HomeView({
         {menuOpen ? (
           <div className="home-menu" id="home-action-menu" role="menu">
             <button type="button" role="menuitem" onClick={() => onMenuAction('plant-seed')}>
-              <span>씨앗 심기</span>
+              <span>내 정원</span>
               <MenuIcon action="plant-seed" />
             </button>
             <button type="button" role="menuitem" onClick={() => onMenuAction('plant-storage')}>

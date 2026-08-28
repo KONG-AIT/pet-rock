@@ -84,7 +84,7 @@ describe('S02 home render model', () => {
 
     expect(closed).toContain('aria-label="액션 메뉴 열기"')
     expect(closed).not.toContain('role="menuitem"')
-    expect(open).toContain('씨앗 심기')
+    expect(open).toContain('내 정원')
     expect(open).toContain('식물 보관함')
     expect(open).toContain('공유')
     expect(open).not.toMatch(/행복도|수분|햇빛|이름 수정|캘린더|설정|꾸미기/)
