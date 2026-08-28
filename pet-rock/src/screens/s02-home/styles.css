@@ -81,41 +81,6 @@
   outline-offset: 8px;
 }
 
-.home-rock {
-  transform-origin: 50% 86%;
-}
-
-.home-rock--reacting {
-  animation: home-rock-nudge 650ms cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.home-rock__art {
-  display: block;
-  width: 100%;
-  overflow: visible;
-  filter: drop-shadow(0 18px 20px rgba(61, 57, 51, 0.14));
-}
-
-.home-rock__body { fill: #92938e; stroke: #676963; stroke-width: 3; }
-.home-rock__art--rock-01 .home-rock__body { fill: #a8aaa5; }
-.home-rock__art--rock-02 .home-rock__body { fill: #6e716e; }
-.home-rock__art--rock-03 .home-rock__body { fill: #b6aa91; }
-.home-rock__texture { fill: rgba(255, 255, 255, 0.22); opacity: 0.38; }
-.home-rock__shadow { fill: rgba(63, 60, 54, 0.15); }
-.home-rock__shine { fill: none; stroke: rgba(255, 255, 255, 0.3); stroke-linecap: round; stroke-width: 12; }
-
-.home-plant {
-  stroke: #58754a;
-  stroke-width: 8;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  fill: #739a60;
-}
-
-.home-plant--flower circle { fill: #d88f8b; stroke: #b96e70; stroke-width: 3; }
-.home-plant--flower .home-plant__center { fill: #e9c66f; stroke: #bf9945; }
-.home-plant--cactus { fill: none; stroke: #668c5d; stroke-width: 15; }
-
 .home__reaction {
   min-height: 1.5em;
   margin: clamp(2px, 1vh, 12px) 0 0;
@@ -245,13 +210,6 @@
   color: #6f433d;
 }
 
-@keyframes home-rock-nudge {
-  0%, 100% { transform: rotate(0deg) translateY(0); }
-  24% { transform: rotate(-1.8deg) translateY(-7px); }
-  54% { transform: rotate(1.2deg) translateY(-3px); }
-  76% { transform: rotate(-0.5deg) translateY(0); }
-}
-
 @media (prefers-reduced-motion: no-preference) {
   .home__menu-backdrop {
     animation: home-menu-backdrop-enter 180ms ease-out both;
@@ -286,7 +244,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .home-rock--reacting { animation-duration: 1ms; }
   .home-menu button,
   .home__menu-backdrop { animation: none; }
   .home__action-button { transition: none; }

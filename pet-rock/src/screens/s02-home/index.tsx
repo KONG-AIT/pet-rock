@@ -18,6 +18,7 @@ import {
   type HomeMenuAction,
 } from './home-model'
 import { requestRockShareOnce, shareThenUnwindMenu } from './home-share'
+import '../../components/visuals/visuals.css'
 import './styles.css'
 
 export type HomeScreenProps = Readonly<{
