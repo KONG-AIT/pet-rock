@@ -425,6 +425,18 @@
   display: none;
 }
 
+.s03-toast {
+  min-height: 22px;
+  padding: 0 max(28px, calc(var(--app-safe-right) + 20px)) 4px
+    max(28px, calc(var(--app-safe-left) + 20px));
+  color: #3f7a52;
+  font-size: 13px;
+}
+
+.s03-toast:empty {
+  display: none;
+}
+
 @keyframes s03-seed-float {
   0%,
   100% { transform: translateY(0) rotate(13deg); }

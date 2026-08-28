@@ -13,7 +13,7 @@ export const NAVIGATION_DESTINATIONS = {
   openPlantStorage: APP_ROUTES.plantStorage,
   backHome: APP_ROUTES.home,
   finishGrowthEquipped: APP_ROUTES.home,
-  finishGrowthStored: APP_ROUTES.plantStorage,
+  finishGrowthStored: APP_ROUTES.planting,
 } as const
 
 export type NavigationCommand = keyof typeof NAVIGATION_DESTINATIONS

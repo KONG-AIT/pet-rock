@@ -428,7 +428,7 @@ describe('game actions', () => {
     expect(storage.state).toEqual(snapshot.gameState)
   })
 
-  it('collects a completed plant and opens storage without changing equipment', async () => {
+  it('collects a completed plant and stays on planting without changing equipment', async () => {
     const planted = unwrap(plantSeed(initialState(), ADOPTED_AT, () => 'plant-02'))
     const storage = new RecordingStorage(planted)
     const app = store(storage, ADOPTED_AT + GROWTH_COMPLETE_MS)
@@ -441,7 +441,7 @@ describe('game actions', () => {
     })
 
     const snapshot = app.getSnapshot()
-    expect(snapshot.route).toBe(APP_ROUTES.plantStorage)
+    expect(snapshot.route).toBe(APP_ROUTES.planting)
     expect(snapshot.gameState?.ownedPlants).toEqual(['plant-02'])
     expect(snapshot.gameState?.equipment).toEqual({ status: 'unequipped' })
     expect(storage.state).toEqual(snapshot.gameState)

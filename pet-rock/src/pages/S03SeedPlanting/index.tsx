@@ -200,6 +200,7 @@ export function S03SeedPlantingPage() {
   const queries = useGameQueries()
   const [pendingAction, setPendingAction] = useState<PendingAction>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null)
   const observedAt = snapshot.status === 'ready' ? snapshot.observedAt : 0
   const viewState = getSeedPlantingViewState(queries.gameState, queries.growth, observedAt)
 
@@ -231,24 +232,35 @@ export function S03SeedPlantingPage() {
     return () => window.clearTimeout(refreshTimer)
   }, [actions, growthPollDelayMs])
 
+  useEffect(() => {
+    if (feedbackMessage === null) {
+      return
+    }
+
+    const dismissTimer = window.setTimeout(() => setFeedbackMessage(null), 2400)
+    return () => window.clearTimeout(dismissTimer)
+  }, [feedbackMessage])
+
   async function runAction(
     pending: Exclude<PendingAction, null>,
     action: () => Promise<AppActionResult>,
   ) {
     setPendingAction(pending)
     setErrorMessage(null)
+    setFeedbackMessage(null)
 
     const result = await action()
 
+    setPendingAction(null)
+
     if (result.ok) {
-      if (pending === 'plant') {
-        setPendingAction(null)
+      if (pending === 'store') {
+        setFeedbackMessage('보관함에 저장했어요.')
       }
       return
     }
 
     setErrorMessage('저장하지 못했어요. 잠시 후 다시 시도해 주세요.')
-    setPendingAction(null)
   }
 
   return (
@@ -274,6 +286,9 @@ export function S03SeedPlantingPage() {
         onEquip={() => void runAction('equip', actions.finishGrowthWithEquipment)}
         onStore={() => void runAction('store', actions.finishGrowthToStorage)}
       />
+      <p className="s03-toast" role="status" aria-live="polite">
+        {feedbackMessage}
+      </p>
       <p className="s03-error" role="status" aria-live="polite">
         {errorMessage}
       </p>

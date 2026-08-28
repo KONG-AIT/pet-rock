@@ -61,9 +61,9 @@ describe('whole game flow integration', () => {
     })
     await app.initialize()
     await app.actions.adoptRock({ rockId: 'rock-03', name: '조약돌' })
+    expect(app.navigation.navigate('openPlanting')).toBe(true)
 
     for (let growthNumber = 0; growthNumber < 2; growthNumber += 1) {
-      expect(app.navigation.navigate('openPlanting')).toBe(true)
       await expect(app.actions.plantSeed()).resolves.toEqual({ ok: true, value: undefined })
       const growth = currentGameState(app).plantGrowth
       expect(growth?.status).toBe('growing')
@@ -77,6 +77,7 @@ describe('whole game flow integration', () => {
         ok: true,
         value: undefined,
       })
+      expect(app.getSnapshot().route).toBe(APP_ROUTES.planting)
     }
 
     expect(currentGameState(app)).toMatchObject({
@@ -120,7 +121,7 @@ describe('whole game flow integration', () => {
       value: undefined,
     })
     expect(app.getSnapshot()).toMatchObject({
-      route: APP_ROUTES.plantStorage,
+      route: APP_ROUTES.planting,
       gameState: {
         plantGrowth: null,
         ownedPlants: ['plant-02'],
