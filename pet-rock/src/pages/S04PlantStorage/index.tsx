@@ -1,15 +1,14 @@
 import { useState } from 'react'
 
 import { useAppNavigation, useGameActions, useGameQueries } from '../../app/index'
-import { HomeRockVisual, StoragePlantVisual, StorageRockVisual } from '../../components/visuals'
-import { PLANT_CATALOG, type GameState, type RockId } from '../../domain'
+import { StoragePlantVisual, StorageRockVisual } from '../../components/visuals'
+import { PLANT_CATALOG, type GameState } from '../../domain'
 import {
   createPlantStorageViewModel,
   getEquippedPlantId,
   hasPendingEquipmentChange,
   type PreviewPlantId,
 } from './model'
-import '../../components/visuals/visuals.css'
 import './styles.css'
 
 function plantName(plantId: PreviewPlantId): string {
@@ -18,32 +17,6 @@ function plantName(plantId: PreviewPlantId): string {
   }
 
   return PLANT_CATALOG.find((plant) => plant.id === plantId)?.displayName ?? '식물'
-}
-
-function Preview({
-  rockId,
-  rockName,
-  plantId,
-}: Readonly<{
-  rockId: RockId
-  rockName: string
-  plantId: PreviewPlantId
-}>) {
-  return (
-    <section className="storage-preview" aria-label="선택 미리보기">
-      <p className="storage-preview__eyebrow">내 돌 미리보기</p>
-      <div className="storage-preview__scene">
-        <HomeRockVisual
-          equippedPlantId={plantId}
-          reacting={false}
-          reactionKey={0}
-          rockId={rockId}
-        />
-      </div>
-      <h2>{rockName}</h2>
-      <p className="storage-preview__selection">{plantName(plantId)}</p>
-    </section>
-  )
 }
 
 function EmptyState({
@@ -120,12 +93,6 @@ export function PlantStorageView({
           <EmptyState onOpenPlanting={onOpenPlanting} />
         ) : (
           <>
-            <Preview
-              rockId={state.rock.id}
-              rockName={state.rock.name}
-              plantId={model.previewPlantId}
-            />
-
             <section className="plant-storage__collection" aria-labelledby="plant-list-title">
               <div className="plant-storage__section-heading">
                 <div>
