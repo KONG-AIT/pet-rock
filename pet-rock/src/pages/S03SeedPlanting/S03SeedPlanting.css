@@ -419,10 +419,7 @@
     max(28px, calc(var(--app-safe-left) + 20px));
   color: #a2493e;
   font-size: 13px;
-}
-
-.s03-error:empty {
-  display: none;
+  line-height: 22px;
 }
 
 .s03-toast {
@@ -431,10 +428,7 @@
     max(28px, calc(var(--app-safe-left) + 20px));
   color: #3f7a52;
   font-size: 13px;
-}
-
-.s03-toast:empty {
-  display: none;
+  line-height: 22px;
 }
 
 @keyframes s03-seed-float {
