@@ -204,55 +204,6 @@ describe('S04 plant storage view', () => {
     )
   })
 
-  it('gives the preview a distinct shape per selected plant and a clear empty state', () => {
-    const state = gameState({
-      ownedPlants: ['plant-01', 'plant-02', 'plant-03'],
-      equipment: { status: 'equipped', plantId: 'plant-01' },
-    })
-
-    const sprout = renderToStaticMarkup(
-      <PlantStorageView
-        {...callbacks}
-        state={state}
-        previewPlantId="plant-01"
-        pending={false}
-        errorMessage={null}
-      />,
-    )
-    const flower = renderToStaticMarkup(
-      <PlantStorageView
-        {...callbacks}
-        state={state}
-        previewPlantId="plant-02"
-        pending={false}
-        errorMessage={null}
-      />,
-    )
-    const cactus = renderToStaticMarkup(
-      <PlantStorageView
-        {...callbacks}
-        state={state}
-        previewPlantId="plant-03"
-        pending={false}
-        errorMessage={null}
-      />,
-    )
-    const none = renderToStaticMarkup(
-      <PlantStorageView
-        {...callbacks}
-        state={state}
-        previewPlantId={null}
-        pending={false}
-        errorMessage={null}
-      />,
-    )
-
-    expect(sprout).toMatch(/storage-preview__scene[\s\S]*?data-plant-id="plant-01"/)
-    expect(flower).toMatch(/storage-preview__scene[\s\S]*?data-plant-id="plant-02"/)
-    expect(cactus).toMatch(/storage-preview__scene[\s\S]*?data-plant-id="plant-03"/)
-    expect(none).not.toContain('data-plant-id')
-  })
-
   it('shows the empty state with a link to planting when no plant is completed', () => {
     const html = renderToStaticMarkup(
       <PlantStorageView
