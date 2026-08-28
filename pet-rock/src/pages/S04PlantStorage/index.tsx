@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
 import { useAppNavigation, useGameActions, useGameQueries } from '../../app/index'
-import { StoragePlantVisual, StorageRockVisual } from '../../components/visuals'
+import { HomeRockVisual, StoragePlantVisual, StorageRockVisual } from '../../components/visuals'
 import { PLANT_CATALOG, type GameState, type RockId } from '../../domain'
 import {
   createPlantStorageViewModel,
@@ -9,6 +9,7 @@ import {
   hasPendingEquipmentChange,
   type PreviewPlantId,
 } from './model'
+import '../../components/visuals/visuals.css'
 import './styles.css'
 
 function plantName(plantId: PreviewPlantId): string {
@@ -32,13 +33,12 @@ function Preview({
     <section className="storage-preview" aria-label="선택 미리보기">
       <p className="storage-preview__eyebrow">내 돌 미리보기</p>
       <div className="storage-preview__scene">
-        {plantId !== null && (
-          <span key={plantId} className="storage-preview__plant">
-            <StoragePlantVisual plantId={plantId} />
-          </span>
-        )}
-        <StorageRockVisual rockId={rockId} />
-        <span className="storage-preview__shadow" aria-hidden="true" />
+        <HomeRockVisual
+          equippedPlantId={plantId}
+          reacting={false}
+          reactionKey={0}
+          rockId={rockId}
+        />
       </div>
       <h2>{rockName}</h2>
       <p className="storage-preview__selection">{plantName(plantId)}</p>

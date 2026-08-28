@@ -247,10 +247,10 @@ describe('S04 plant storage view', () => {
       />,
     )
 
-    expect(sprout).toMatch(/storage-preview__plant">[\s\S]*?storage-plant--sprout/)
-    expect(flower).toMatch(/storage-preview__plant">[\s\S]*?storage-plant--flower/)
-    expect(cactus).toMatch(/storage-preview__plant">[\s\S]*?storage-plant--cactus/)
-    expect(none).not.toContain('storage-preview__plant')
+    expect(sprout).toMatch(/storage-preview__scene[\s\S]*?data-plant-id="plant-01"/)
+    expect(flower).toMatch(/storage-preview__scene[\s\S]*?data-plant-id="plant-02"/)
+    expect(cactus).toMatch(/storage-preview__scene[\s\S]*?data-plant-id="plant-03"/)
+    expect(none).not.toContain('data-plant-id')
   })
 
   it('shows the empty state with a link to planting when no plant is completed', () => {
