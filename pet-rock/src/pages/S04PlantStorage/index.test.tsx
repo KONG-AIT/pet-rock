@@ -142,11 +142,29 @@ describe('S04 plant storage view', () => {
     expect(html).toContain('식물')
     expect(html).toContain('없음')
     expect(html).toContain('장착 중')
-    expect(html).toContain('미리보기 선택')
+    expect(html).toContain('완전히 자란 식물만 보여요')
     expect(html).toContain('미획득')
     expect(html).toContain('머리에 심기')
     expect(html).toContain('disabled=""')
     expect(html).toContain('plant-storage__panel--with-apply')
+  })
+
+  it('does not repeat the completed-plants description in the header', () => {
+    const html = renderToStaticMarkup(
+      <PlantStorageView
+        {...callbacks}
+        state={gameState({
+          ownedPlants: ['plant-01'],
+          equipment: { status: 'equipped', plantId: 'plant-01' },
+        })}
+        previewPlantId="plant-01"
+        pending={false}
+        errorMessage={null}
+      />,
+    )
+
+    expect(html.match(/완전히 자란/g)).toHaveLength(1)
+    expect(html).not.toContain('완전히 자란 식물 모음')
   })
 
   it('distinguishes persisted equipment from a different preview selection', () => {
