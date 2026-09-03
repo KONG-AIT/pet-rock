@@ -2,6 +2,7 @@ import { useState } from 'react'
 
 import { useAppNavigation, useGameActions, useGameQueries } from '../../app/index'
 import { StoragePlantVisual, StorageRockVisual } from '../../components/visuals'
+import '../../components/visuals/visuals.css'
 import { PLANT_CATALOG, type GameState } from '../../domain'
 import {
   createPlantStorageViewModel,

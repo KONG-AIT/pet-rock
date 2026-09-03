@@ -88,10 +88,21 @@
 }
 
 .s01-rock-illustration {
+  position: relative;
   display: block;
   width: 100%;
-  height: auto;
-  overflow: visible;
+  aspect-ratio: 1;
+  overflow: hidden;
+}
+
+.s01-rock-illustration > .visual-layer--rock,
+.s01-rock-illustration > .visual-layer--face {
+  z-index: 1;
+  object-fit: contain;
+}
+
+.s01-rock-illustration > .visual-layer--face {
+  z-index: 2;
 }
 
 .s01-rock-shadow {

@@ -4,6 +4,8 @@ import { describe, expect, it } from 'vitest'
 import { PLANT_IDS, ROCK_IDS } from '../../domain'
 import {
   CompletedPlantVisual,
+  PLANT_STAGE_THREE_SPECS,
+  ROCK_VISUAL_SPECS,
   HomeRockVisual,
   SelectionRockVisual,
   StoragePlantVisual,
@@ -26,6 +28,28 @@ describe('shared rock visuals', () => {
 
     expect(markup).toContain(`data-rock="${rockId}"`)
     expect(markup).toContain('aria-hidden="true"')
+  })
+
+  it.each(ROCK_IDS)('reuses the %s canonical source in every context', (rockId) => {
+    const source = ROCK_VISUAL_SPECS[rockId].src
+    const selection = renderToStaticMarkup(<SelectionRockVisual label="돌 후보" rockId={rockId} />)
+    const home = renderToStaticMarkup(<HomeRockVisual rockId={rockId} equippedPlantId={null} reacting={false} reactionKey={0} />)
+    const storage = renderToStaticMarkup(<StorageRockVisual rockId={rockId} />)
+
+    expect(selection).toContain(`src="${source}"`)
+    expect(home).toContain(`src="${source}"`)
+    expect(storage).toContain(`src="${source}"`)
+  })
+
+  it('orders home layers and changes face and FX for a reaction', () => {
+    const quiet = renderToStaticMarkup(<HomeRockVisual rockId="rock-01" equippedPlantId="plant-01" reacting={false} reactionKey={0} />)
+    const reacting = renderToStaticMarkup(<HomeRockVisual rockId="rock-01" equippedPlantId="plant-01" reacting reactionKey={1} />)
+
+    expect(quiet.indexOf('data-layer="ground"')).toBeLessThan(quiet.indexOf('data-layer="rock"'))
+    expect(quiet.indexOf('data-layer="rock"')).toBeLessThan(quiet.indexOf('data-layer="face-neutral"'))
+    expect(quiet.indexOf('data-layer="face-neutral"')).toBeLessThan(quiet.indexOf('data-layer="equipped-plant"'))
+    expect(reacting).toContain('data-layer="face-happy"')
+    expect(reacting.indexOf('data-layer="equipped-plant"')).toBeLessThan(reacting.indexOf('data-layer="touch-fx"'))
   })
 })
 
@@ -57,14 +81,24 @@ describe('shared plant visuals', () => {
     expect(markup).toContain('aria-hidden="true"')
   })
 
-  it('gives each owned plant a visually distinct storage shape', () => {
-    const shapes = PLANT_IDS.map((plantId) => {
-      const markup = renderToStaticMarkup(<StoragePlantVisual plantId={plantId} />)
-      const match = /storage-plant--(\w+)/.exec(markup)
-      return match?.[1]
-    })
+  it.each(PLANT_IDS)('reuses the %s stage-03 source in every context', (plantId) => {
+    const source = PLANT_STAGE_THREE_SPECS[plantId].src
+    const home = renderToStaticMarkup(<HomeRockVisual rockId="rock-01" equippedPlantId={plantId} reacting={false} reactionKey={0} />)
+    const completed = renderToStaticMarkup(<CompletedPlantVisual plantId={plantId} />)
+    const storage = renderToStaticMarkup(<StoragePlantVisual plantId={plantId} />)
 
-    expect(shapes).toEqual(['sprout', 'flower', 'cactus'])
-    expect(new Set(shapes).size).toBe(PLANT_IDS.length)
+    expect(home).toContain(`src="${source}"`)
+    expect(completed).toContain(`src="${source}"`)
+    expect(storage).toContain(`src="${source}"`)
+  })
+
+  it('maps every current domain id to a distinct canonical PNG', () => {
+    const rockSources = ROCK_IDS.map((rockId) => ROCK_VISUAL_SPECS[rockId].src)
+    const plantSources = PLANT_IDS.map((plantId) => PLANT_STAGE_THREE_SPECS[plantId].src)
+
+    expect(rockSources.every((src) => src.endsWith('.png'))).toBe(true)
+    expect(plantSources.every((src) => src.endsWith('.png'))).toBe(true)
+    expect(new Set(rockSources).size).toBe(ROCK_IDS.length)
+    expect(new Set(plantSources).size).toBe(PLANT_IDS.length)
   })
 })

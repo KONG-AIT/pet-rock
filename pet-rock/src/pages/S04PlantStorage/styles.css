@@ -22,6 +22,7 @@
   overflow: hidden;
   color: var(--storage-ink);
   background:
+    url('../../assets/environment/backgrounds/background-collection.png') center / cover no-repeat,
     radial-gradient(circle at 88% 4%, rgba(211, 229, 202, 0.6), transparent 25%),
     linear-gradient(180deg, #fffef9 0%, var(--storage-paper) 100%);
   text-align: left;
@@ -507,4 +508,30 @@ button.plant-card {
   .plant-storage__back:active {
     transform: scale(0.97);
   }
+}
+
+/* Canonical raster visuals keep their square transparent canvas in every card. */
+.plant-storage .storage-rock,
+.plant-storage .storage-plant {
+  width: 72px;
+  height: 72px;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.plant-storage .storage-rock[data-rock] {
+  border-radius: 0;
+  background: none;
+}
+
+.plant-card--none .storage-rock {
+  width: 68px;
+  height: 68px;
+}
+
+.storage-empty__illustration .storage-rock {
+  width: 94px;
+  height: 94px;
 }

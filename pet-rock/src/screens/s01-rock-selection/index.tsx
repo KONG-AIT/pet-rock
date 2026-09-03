@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react'
 
 import { useGameActions, useTransientHistoryEntry } from '../../app/index'
 import { SelectionRockVisual } from '../../components/visuals'
+import '../../components/visuals/visuals.css'
 import type { RockId } from '../../domain'
 import {
   ROCK_OPTIONS,

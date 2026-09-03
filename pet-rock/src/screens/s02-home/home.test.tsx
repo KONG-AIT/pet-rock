@@ -28,12 +28,13 @@ function renderHome(
   menuOpen = false,
   sharePending = false,
   shareNotice: HomeShareNotice = null,
+  reacting = false,
 ) {
   return renderToStaticMarkup(
     <HomeView
       model={model}
       menuOpen={menuOpen}
-      reacting={false}
+      reacting={reacting}
       reactionKey={0}
       shareNotice={shareNotice}
       sharePending={sharePending}
@@ -61,6 +62,18 @@ describe('S02 home render model', () => {
 
     expect(markup).not.toContain('data-plant-id=')
     expect(markup).toContain('data-elapsed-state="none"')
+  })
+
+  it('uses neutral art at rest and happy art with touch FX while reacting', () => {
+    const model = createHomeRenderModel(state, null)
+    const quiet = renderHome(model)
+    const reacting = renderHome(model, false, false, null, true)
+
+    expect(quiet).toContain('data-layer="face-neutral"')
+    expect(quiet).not.toContain('data-layer="touch-fx"')
+    expect(reacting).toContain('data-layer="face-happy"')
+    expect(reacting).toContain('data-layer="touch-fx"')
+    expect(reacting).toContain('방금 살짝 움직인 것 같아요.')
   })
 
   it.each([

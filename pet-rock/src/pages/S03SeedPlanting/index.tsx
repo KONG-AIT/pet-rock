@@ -7,7 +7,8 @@ import {
   useGameQueries,
 } from '../../app/index'
 import type { AppActionResult } from '../../app/index'
-import { CompletedPlantVisual } from '../../components/visuals'
+import { CompletedPlantVisual, GrowthPlantVisual } from '../../components/visuals'
+import '../../components/visuals/visuals.css'
 import {
   formatRemainingTime,
   getGrowthPollDelayMs,
@@ -53,16 +54,6 @@ function PotIllustration({ stage }: { stage: 'empty' | 'planted' | 'growing' }) 
   return (
     <svg className={`s03-pot s03-pot--${stage}`} viewBox="0 0 280 300" aria-hidden="true">
       <ellipse className="s03-pot__shadow" cx="140" cy="274" rx="91" ry="16" />
-      {stage === 'planted' ? (
-        <path className="s03-sprout s03-sprout--planted" d="M140 105v35" />
-      ) : null}
-      {stage === 'growing' ? (
-        <g className="s03-sprout s03-sprout--growing">
-          <path d="M140 49v91" />
-          <path d="M140 88c-29 1-45-12-47-35 27-3 45 8 47 35Z" />
-          <path d="M140 73c24 1 40-10 43-31-24-3-40 8-43 31Z" />
-        </g>
-      ) : null}
       <ellipse className="s03-pot__rim" cx="140" cy="145" rx="102" ry="38" />
       <ellipse className="s03-pot__soil" cx="140" cy="141" rx="86" ry="25" />
       <path className="s03-pot__body" d="M51 153h178l-24 108c-2 10-11 17-21 17H96c-10 0-19-7-21-17L51 153Z" />
@@ -137,6 +128,7 @@ export function SeedPlantingContent({
           <p className="s03-state__description">어떤 식물이 될까요?</p>
         </div>
         <div className="s03-visual">
+          <GrowthPlantVisual stage={viewState.stage} />
           <PotIllustration stage={viewState.stage} />
         </div>
         <div className="s03-growth-details">
@@ -169,6 +161,7 @@ export function SeedPlantingContent({
       <div className="s03-visual s03-visual--completed">
         {viewState.isNew ? <span className="s03-new-badge">NEW</span> : null}
         <CompletedPlantVisual plantId={viewState.plantId} />
+        <PotIllustration stage="empty" />
       </div>
       <p className="s03-plant-name">{viewState.displayName}</p>
       <div className="s03-actions s03-actions--completed">

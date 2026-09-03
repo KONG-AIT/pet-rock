@@ -147,6 +147,10 @@ describe('S04 plant storage view', () => {
     expect(html).toContain('머리에 심기')
     expect(html).toContain('disabled=""')
     expect(html).toContain('plant-storage__panel--with-apply')
+    expect(html).toContain('data-plant="plant-01"')
+    expect(html).toContain('data-layer="plant-stage-03"')
+    expect(html).toContain('data-layer="face-neutral"')
+    expect(html).toMatch(/plant-card--locked[\s\S]*plant-card__mystery/)
   })
 
   it('does not repeat the completed-plants description in the header', () => {

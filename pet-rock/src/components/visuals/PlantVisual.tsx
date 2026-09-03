@@ -1,94 +1,96 @@
+import { useState } from 'react'
+
+import growthFxSrc from '../../assets/fx/fx-growth-01.png'
+import soilFxSrc from '../../assets/fx/fx-soil-01.png'
+import sparkleFxSrc from '../../assets/fx/fx-sparkle-01.png'
+import plantedSrc from '../../assets/plants/plant-02/stage-01.png'
+import growingSrc from '../../assets/plants/plant-02/stage-02.png'
+import plant01Src from '../../assets/plants/plant-01/stage-03.png'
+import plant02Src from '../../assets/plants/plant-02/stage-03.png'
+import plant03Src from '../../assets/plants/plant-03/stage-03.png'
 import type { PlantId } from '../../domain'
 
-const STORAGE_PLANT_SHAPES: Readonly<Record<PlantId, 'sprout' | 'flower' | 'cactus'>> = {
-  'plant-01': 'sprout',
-  'plant-02': 'flower',
-  'plant-03': 'cactus',
+type Bounds = Readonly<{ x: number; y: number; width: number; height: number }>
+
+export type PlantVisualSpec = Readonly<{
+  src: string
+  visibleBounds: Bounds
+  stemAnchor: Readonly<{ x: number; y: number }>
+}>
+
+// eslint-disable-next-line react-refresh/only-export-components
+export const PLANT_STAGE_THREE_SPECS: Readonly<Record<PlantId, PlantVisualSpec>> = {
+  'plant-01': { src: plant01Src, visibleBounds: { x: 0, y: 0.0167, width: 0.9904, height: 0.953 }, stemAnchor: { x: 0.5, y: 0.9697 } },
+  'plant-02': { src: plant02Src, visibleBounds: { x: 0.0734, y: 0.0234, width: 0.8531, height: 0.9719 }, stemAnchor: { x: 0.5, y: 0.9953 } },
+  'plant-03': { src: plant03Src, visibleBounds: { x: 0, y: 0.0112, width: 0.9633, height: 0.9633 }, stemAnchor: { x: 0.5, y: 0.9745 } },
+}
+
+// eslint-disable-next-line react-refresh/only-export-components
+export const SHARED_GROWTH_SPECS = {
+  planted: { src: plantedSrc, visibleBounds: { x: 0.2859, y: 0.7063, width: 0.4281, height: 0.2891 }, stemAnchor: { x: 0.5, y: 0.9953 } },
+  growing: { src: growingSrc, visibleBounds: { x: 0.1766, y: 0.3422, width: 0.6484, height: 0.6531 }, stemAnchor: { x: 0.5, y: 0.9953 } },
+} as const
+
+function PlantFallback({ plantId, className }: Readonly<{ plantId: PlantId; className: string }>) {
+  return (
+    <svg className={className} viewBox="0 0 260 260" aria-hidden="true">
+      <g className="plant-fallback__growth">
+        <path d="M130 236V106" />
+        <path d="M129 169c-35 1-56-15-58-43 34-4 55 13 58 43Z" />
+        <path d="M131 146c31 1 50-13 54-39-30-4-51 11-54 39Z" />
+        {plantId === 'plant-02' ? <circle cx="130" cy="91" r="28" /> : null}
+        {plantId === 'plant-03' ? <path d="M98 112c3-35 16-56 32-56s29 21 32 56c-9 13-20 19-32 19s-23-6-32-19Z" /> : null}
+      </g>
+    </svg>
+  )
+}
+
+function PlantImage({ src, layer, className, fallback }: Readonly<{ src: string; layer: string; className: string; fallback: React.ReactNode }>) {
+  const [failed, setFailed] = useState(false)
+  return (
+    <>
+      {failed ? fallback : null}
+      {!failed ? <img className={className} data-layer={layer} src={src} alt="" draggable={false} onError={() => setFailed(true)} /> : null}
+    </>
+  )
+}
+
+function DecorativeImage({ src, layer, className }: Readonly<{ src: string; layer: string; className: string }>) {
+  return <img className={className} data-layer={layer} src={src} alt="" draggable={false} onError={(event) => { event.currentTarget.hidden = true }} />
 }
 
 export function EquippedPlantVisual({ plantId }: Readonly<{ plantId: PlantId }>) {
-  if (plantId === 'plant-02') {
-    return (
-      <g className="home-plant home-plant--flower" data-plant-id={plantId}>
-        <path d="M155 82V35" />
-        <path d="M155 59c-18-3-26-13-25-27 17 0 27 8 25 27Z" />
-        <path d="M155 66c17-3 26-12 26-25-17 0-27 8-26 25Z" />
-        <circle cx="155" cy="27" r="12" />
-        <circle cx="143" cy="28" r="10" />
-        <circle cx="167" cy="28" r="10" />
-        <circle className="home-plant__center" cx="155" cy="28" r="7" />
-      </g>
-    )
-  }
-
-  if (plantId === 'plant-03') {
-    return (
-      <g className="home-plant home-plant--cactus" data-plant-id={plantId}>
-        <path d="M145 83V39c0-12 20-12 20 0v44" />
-        <path d="M145 61h-10c-8 0-8-8-8-16" />
-        <path d="M165 54h9c8 0 8-8 8-15" />
-      </g>
-    )
-  }
-
   return (
-    <g className="home-plant home-plant--sprout" data-plant-id={plantId}>
-      <path d="M155 84V43" />
-      <path d="M154 56c-22-1-34-12-33-30 21 0 34 10 33 30Z" />
-      <path d="M156 63c22-1 34-11 34-29-21 0-34 10-34 29Z" />
-    </g>
+    <span className="visual-layer visual-layer--equipped-plant" data-plant-id={plantId} data-layer="equipped-plant">
+      <PlantImage src={PLANT_STAGE_THREE_SPECS[plantId].src} layer="plant-stage-03" className="visual-layer__image" fallback={<PlantFallback plantId={plantId} className="visual-layer__image plant-fallback" />} />
+    </span>
   )
 }
 
 export function CompletedPlantVisual({ plantId }: Readonly<{ plantId: PlantId }>) {
   return (
-    <svg className={`s03-completed-plant s03-completed-plant--${plantId}`} viewBox="0 0 260 340" aria-hidden="true">
-      <ellipse className="s03-pot__shadow" cx="130" cy="315" rx="86" ry="14" />
-      <g className="s03-completed-plant__growth">
-        <path className="s03-completed-plant__stem" d="M130 190V68" />
-        {plantId === 'plant-01' ? (
-          <>
-            <path d="M129 131c-35 1-56-15-58-43 34-4 55 13 58 43Z" />
-            <path d="M131 108c31 1 50-13 54-39-30-4-51 11-54 39Z" />
-          </>
-        ) : null}
-        {plantId === 'plant-02' ? (
-          <>
-            <path d="M129 150c-29 1-46-12-48-35 28-4 46 11 48 35Z" />
-            <path d="M131 128c27 0 44-12 47-35-27-3-44 10-47 35Z" />
-            <circle cx="130" cy="63" r="31" />
-            <circle className="s03-completed-plant__center" cx="130" cy="63" r="12" />
-          </>
-        ) : null}
-        {plantId === 'plant-03' ? (
-          <>
-            <path d="M129 145c-28 1-45-12-47-35 27-3 45 10 47 35Z" />
-            <path d="M131 119c26 1 43-11 46-34-26-3-43 10-46 34Z" />
-            <path className="s03-completed-plant__crown" d="M95 79c3-30 17-49 35-49s32 19 35 49c-10 12-23 18-35 18S105 91 95 79Z" />
-          </>
-        ) : null}
-      </g>
-      <ellipse className="s03-pot__rim" cx="130" cy="195" rx="94" ry="34" />
-      <ellipse className="s03-pot__soil" cx="130" cy="191" rx="79" ry="22" />
-      <path className="s03-pot__body" d="M48 203h164l-22 99c-2 9-10 15-19 15H89c-9 0-17-6-19-15l-22-99Z" />
-      <path className="s03-pot__lip" d="M40 194h180v31c0 8-6 14-14 14H54c-8 0-14-6-14-14v-31Z" />
-    </svg>
+    <span className={`s03-completed-plant s03-completed-plant--${plantId}`} data-plant-id={plantId} aria-hidden="true">
+      <PlantImage src={PLANT_STAGE_THREE_SPECS[plantId].src} layer="plant-stage-03" className="visual-layer visual-layer--growth-plant" fallback={<PlantFallback plantId={plantId} className="visual-layer plant-fallback" />} />
+      <DecorativeImage className="visual-layer visual-layer--sparkle-fx" layer="sparkle-fx" src={sparkleFxSrc} />
+    </span>
+  )
+}
+
+export function GrowthPlantVisual({ stage }: Readonly<{ stage: 'planted' | 'growing' }>) {
+  return (
+    <span className={`s03-growth-visual s03-growth-visual--${stage}`} data-growth-stage={stage} aria-hidden="true">
+      <span className={`s03-growth-fallback s03-growth-fallback--${stage}`} />
+      <span className="visual-layer visual-layer--growth-plant" data-layer={`plant-stage-${stage === 'planted' ? '01' : '02'}`} />
+      <DecorativeImage className="visual-layer visual-layer--soil-fx" layer="soil-fx" src={soilFxSrc} />
+      {stage === 'growing' ? <DecorativeImage className="visual-layer visual-layer--growth-fx" layer="growth-fx" src={growthFxSrc} /> : null}
+    </span>
   )
 }
 
 export function StoragePlantVisual({ plantId }: Readonly<{ plantId: PlantId }>) {
-  const shape = STORAGE_PLANT_SHAPES[plantId]
-
   return (
-    <span
-      className={`storage-plant storage-plant--${shape}`}
-      data-plant={plantId}
-      aria-hidden="true"
-    >
-      <span className="storage-plant__stem" />
-      <span className="storage-plant__leaf storage-plant__leaf--left" />
-      <span className="storage-plant__leaf storage-plant__leaf--right" />
-      <span className="storage-plant__bloom" />
+    <span className="storage-plant" data-plant={plantId} aria-hidden="true">
+      <PlantImage src={PLANT_STAGE_THREE_SPECS[plantId].src} layer="plant-stage-03" className="visual-layer visual-layer--storage-plant" fallback={<PlantFallback plantId={plantId} className="visual-layer plant-fallback" />} />
     </span>
   )
 }

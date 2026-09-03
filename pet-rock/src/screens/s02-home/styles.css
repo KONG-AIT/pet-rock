@@ -9,6 +9,7 @@
   overflow: hidden;
   color: var(--home-ink);
   background:
+    url('../../assets/environment/backgrounds/background-home.png') center / cover no-repeat,
     radial-gradient(circle at 50% 72%, rgba(205, 213, 201, 0.42), transparent 28%),
     linear-gradient(180deg, #fbfaf6 0%, #f5f2e9 100%);
   isolation: isolate;
@@ -250,14 +251,5 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  .home {
-    --home-ink: #eeece6;
-    --home-muted: #b6b0a8;
-    background:
-      radial-gradient(circle at 50% 72%, rgba(101, 112, 95, 0.28), transparent 30%),
-      linear-gradient(180deg, #252620 0%, #1d1e1b 100%);
-  }
-  .home__menu-backdrop { background: rgba(26, 27, 24, 0.46); }
-  .home__share-notice { background: rgba(45, 46, 41, 0.95); }
-  .home__share-notice--error { color: #e2b8b0; }
+  .home__menu-backdrop { background: rgba(246, 243, 234, 0.52); }
 }

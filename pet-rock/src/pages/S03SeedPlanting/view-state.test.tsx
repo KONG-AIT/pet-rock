@@ -59,6 +59,10 @@ describe('S03 seed planting view states', () => {
     expect(html).toContain('남은 시간')
     expect(html).not.toContain('식물 2')
     expect(html).not.toContain('plant-02')
+    expect(html).toContain(`data-growth-stage="${stage}"`)
+    expect(html).toContain(`data-layer="plant-stage-${stage === 'planted' ? '01' : '02'}"`)
+    expect(html).toContain('data-layer="soil-fx"')
+    if (stage === 'growing') expect(html).toContain('data-layer="growth-fx"')
     expect(html).not.toContain('씨앗 심기</button>')
   })
 
@@ -88,6 +92,8 @@ describe('S03 seed planting view states', () => {
     expect(html).toContain('식물 3')
     expect(html).toContain('머리에 심기')
     expect(html).toContain('보관하기')
+    expect(html).toContain('data-layer="plant-stage-03"')
+    expect(html).toContain('data-layer="sparkle-fx"')
   })
 
   it('keeps completed actions enabled after the planting action has finished', () => {
