@@ -40,6 +40,8 @@ describe('shared rock visuals', () => {
     expect(selection).not.toContain('rock-visual__fallback')
     expect(home).toContain(`src="${source}"`)
     expect(storage).toContain(`src="${source}"`)
+    expect(source).toContain('/assets/runtime/rocks/')
+    expect(ROCK_VISUAL_SPECS[rockId].fallbackSrc).not.toBe(source)
   })
 
   it('orders home layers and changes face and FX for a reaction', () => {
@@ -51,6 +53,9 @@ describe('shared rock visuals', () => {
     expect(quiet.indexOf('data-layer="face-neutral"')).toBeLessThan(quiet.indexOf('data-layer="equipped-plant"'))
     expect(reacting).toContain('data-layer="face-happy"')
     expect(reacting.indexOf('data-layer="equipped-plant"')).toBeLessThan(reacting.indexOf('data-layer="touch-fx"'))
+    expect(reacting).toContain('home-rock__character--reacting')
+    expect(reacting.indexOf('data-layer="ground"')).toBeLessThan(reacting.indexOf('home-rock__character--reacting'))
+    expect(reacting).not.toContain('home-rock home-rock--rock-01 home-rock--reacting')
   })
 })
 
@@ -91,6 +96,10 @@ describe('shared plant visuals', () => {
     expect(home).toContain(`src="${source}"`)
     expect(completed).toContain(`src="${source}"`)
     expect(storage).toContain(`src="${source}"`)
+    expect(storage).toContain('loading="lazy"')
+    expect(source).toContain('/assets/runtime/plants/')
+    expect(PLANT_STAGE_THREE_SPECS[plantId].fallbackSrc).not.toBe(source)
+    expect(home).not.toContain('plant-fallback')
   })
 
   it('maps every current domain id to a distinct canonical PNG', () => {

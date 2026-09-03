@@ -22,7 +22,7 @@
   overflow: hidden;
   color: var(--storage-ink);
   background:
-    url('../../assets/environment/backgrounds/background-collection.png') center / cover no-repeat,
+    url('../../assets/runtime/backgrounds/background-collection.png') center / cover no-repeat,
     radial-gradient(circle at 88% 4%, rgba(211, 229, 202, 0.6), transparent 25%),
     linear-gradient(180deg, #fffef9 0%, var(--storage-paper) 100%);
   text-align: left;

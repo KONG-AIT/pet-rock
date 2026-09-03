@@ -9,7 +9,7 @@
   overflow: hidden;
   color: var(--home-ink);
   background:
-    url('../../assets/environment/backgrounds/background-home.png') center / cover no-repeat,
+    url('../../assets/runtime/backgrounds/background-home.png') center / cover no-repeat,
     radial-gradient(circle at 50% 72%, rgba(205, 213, 201, 0.42), transparent 28%),
     linear-gradient(180deg, #fbfaf6 0%, #f5f2e9 100%);
   isolation: isolate;

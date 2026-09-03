@@ -1,12 +1,19 @@
 import { useState } from 'react'
 
-import faceHappySrc from '../../assets/faces/face-happy.png'
-import faceNeutralSrc from '../../assets/faces/face-neutral.png'
-import groundSrc from '../../assets/environment/rock-ground.png'
-import touchFxSrc from '../../assets/fx/fx-touch-01.png'
-import rock01Src from '../../assets/rocks/rock-01.png'
-import rock02Src from '../../assets/rocks/rock-02.png'
-import rock03Src from '../../assets/rocks/rock-03.png'
+import faceHappyFallbackSrc from '../../assets/faces/face-happy.png'
+import faceNeutralFallbackSrc from '../../assets/faces/face-neutral.png'
+import groundFallbackSrc from '../../assets/environment/rock-ground.png'
+import touchFxFallbackSrc from '../../assets/fx/fx-touch-01.png'
+import rock01FallbackSrc from '../../assets/rocks/rock-01.png'
+import rock02FallbackSrc from '../../assets/rocks/rock-02.png'
+import rock03FallbackSrc from '../../assets/rocks/rock-03.png'
+import groundSrc from '../../assets/runtime/environment/rock-ground.png'
+import faceHappySrc from '../../assets/runtime/faces/face-happy.png'
+import faceNeutralSrc from '../../assets/runtime/faces/face-neutral.png'
+import touchFxSrc from '../../assets/runtime/fx/fx-touch.png'
+import rock01Src from '../../assets/runtime/rocks/rock-01.png'
+import rock02Src from '../../assets/runtime/rocks/rock-02.png'
+import rock03Src from '../../assets/runtime/rocks/rock-03.png'
 import type { PlantId, RockId } from '../../domain'
 import { EquippedPlantVisual } from './PlantVisual'
 
@@ -14,6 +21,7 @@ type Bounds = Readonly<{ x: number; y: number; width: number; height: number }>
 
 export type RockVisualSpec = Readonly<{
   src: string
+  fallbackSrc: string
   visibleBounds: Bounds
   groundY: number
   plantAnchor: Readonly<{ x: number; y: number }>
@@ -23,18 +31,21 @@ export type RockVisualSpec = Readonly<{
 export const ROCK_VISUAL_SPECS: Readonly<Record<RockId, RockVisualSpec>> = {
   'rock-01': {
     src: rock01Src,
+    fallbackSrc: rock01FallbackSrc,
     visibleBounds: { x: 0.082, y: 0.171, width: 0.864, height: 0.687 },
     groundY: 0.858,
     plantAnchor: { x: 0.5, y: 0.19 },
   },
   'rock-02': {
     src: rock02Src,
+    fallbackSrc: rock02FallbackSrc,
     visibleBounds: { x: 0.039, y: 0.32, width: 0.926, height: 0.438 },
     groundY: 0.758,
     plantAnchor: { x: 0.5, y: 0.34 },
   },
   'rock-03': {
     src: rock03Src,
+    fallbackSrc: rock03FallbackSrc,
     visibleBounds: { x: 0.065, y: 0.289, width: 0.88, height: 0.469 },
     groundY: 0.758,
     plantAnchor: { x: 0.5, y: 0.31 },
@@ -43,8 +54,8 @@ export const ROCK_VISUAL_SPECS: Readonly<Record<RockId, RockVisualSpec>> = {
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const FACE_VISUAL_SOURCES = {
-  neutral: faceNeutralSrc,
-  happy: faceHappySrc,
+  neutral: { src: faceNeutralSrc, fallbackSrc: faceNeutralFallbackSrc },
+  happy: { src: faceHappySrc, fallbackSrc: faceHappyFallbackSrc },
 } as const
 
 const SELECTION_ROCK_PATHS: Readonly<Record<RockId, string>> = {
@@ -93,13 +104,23 @@ function HomeFaceFallback() {
   )
 }
 
-function RasterLayer({ className, layer, src, onError }: Readonly<{
+function RasterLayer({ className, layer, src, fallbackSrc, onError }: Readonly<{
   className: string
   layer: string
   src: string
+  fallbackSrc: string
   onError(): void
 }>) {
-  return <img className={className} data-layer={layer} src={src} alt="" draggable={false} onError={(event) => { event.currentTarget.hidden = true; onError() }} />
+  return <img className={className} data-layer={layer} src={src} alt="" decoding="async" draggable={false} onError={(event) => {
+    const image = event.currentTarget
+    if (image.dataset.fallbackAttempted !== 'true') {
+      image.dataset.fallbackAttempted = 'true'
+      image.src = fallbackSrc
+      return
+    }
+    image.hidden = true
+    onError()
+  }} />
 }
 
 export function SelectionRockVisual({ rockId, label, large = false }: Readonly<{
@@ -115,8 +136,8 @@ export function SelectionRockVisual({ rockId, label, large = false }: Readonly<{
       role="img"
     >
       {failed ? <SelectionFallback rockId={rockId} /> : null}
-      {!failed ? <RasterLayer className="visual-layer visual-layer--rock" layer="rock" src={ROCK_VISUAL_SPECS[rockId].src} onError={() => setFailed(true)} /> : null}
-      {!failed ? <RasterLayer className="visual-layer visual-layer--face" layer="face-neutral" src={faceNeutralSrc} onError={() => setFailed(true)} /> : null}
+      {!failed ? <RasterLayer className="visual-layer visual-layer--rock" layer="rock" src={ROCK_VISUAL_SPECS[rockId].src} fallbackSrc={ROCK_VISUAL_SPECS[rockId].fallbackSrc} onError={() => setFailed(true)} /> : null}
+      {!failed ? <RasterLayer className="visual-layer visual-layer--face" layer="face-neutral" src={faceNeutralSrc} fallbackSrc={faceNeutralFallbackSrc} onError={() => setFailed(true)} /> : null}
     </span>
   )
 }
@@ -130,14 +151,16 @@ export function HomeRockVisual({ rockId, equippedPlantId, reacting, reactionKey 
   const [rockFailed, setRockFailed] = useState(false)
   const [faceFailed, setFaceFailed] = useState(false)
   return (
-    <div key={reactionKey} className={`home-rock home-rock--${rockId}${reacting ? ' home-rock--reacting' : ''}`}>
-      <RasterLayer className="visual-layer home-rock__ground" layer="ground" src={groundSrc} onError={() => undefined} />
-      {rockFailed ? <HomeFallback rockId={rockId} /> : null}
-      {!rockFailed ? <RasterLayer className="visual-layer visual-layer--rock" layer="rock" src={ROCK_VISUAL_SPECS[rockId].src} onError={() => setRockFailed(true)} /> : null}
-      {faceFailed ? <HomeFaceFallback /> : null}
-      {!faceFailed ? <RasterLayer className="visual-layer visual-layer--face" layer={reacting ? 'face-happy' : 'face-neutral'} src={reacting ? faceHappySrc : faceNeutralSrc} onError={() => setFaceFailed(true)} /> : null}
-      {equippedPlantId === null ? null : <EquippedPlantVisual plantId={equippedPlantId} />}
-      {reacting ? <RasterLayer className="visual-layer visual-layer--touch-fx" layer="touch-fx" src={touchFxSrc} onError={() => undefined} /> : null}
+    <div className={`home-rock home-rock--${rockId}`}>
+      <RasterLayer className="visual-layer home-rock__ground" layer="ground" src={groundSrc} fallbackSrc={groundFallbackSrc} onError={() => undefined} />
+      <div key={reactionKey} className={`home-rock__character${reacting ? ' home-rock__character--reacting' : ''}`}>
+        {rockFailed ? <HomeFallback rockId={rockId} /> : null}
+        {!rockFailed ? <RasterLayer className="visual-layer visual-layer--rock" layer="rock" src={ROCK_VISUAL_SPECS[rockId].src} fallbackSrc={ROCK_VISUAL_SPECS[rockId].fallbackSrc} onError={() => setRockFailed(true)} /> : null}
+        {faceFailed ? <HomeFaceFallback /> : null}
+        {!faceFailed ? <RasterLayer className="visual-layer visual-layer--face" layer={reacting ? 'face-happy' : 'face-neutral'} src={reacting ? faceHappySrc : faceNeutralSrc} fallbackSrc={reacting ? faceHappyFallbackSrc : faceNeutralFallbackSrc} onError={() => setFaceFailed(true)} /> : null}
+        {equippedPlantId === null ? null : <EquippedPlantVisual plantId={equippedPlantId} />}
+        {reacting ? <RasterLayer className="visual-layer visual-layer--touch-fx" layer="touch-fx" src={touchFxSrc} fallbackSrc={touchFxFallbackSrc} onError={() => undefined} /> : null}
+      </div>
     </div>
   )
 }
@@ -147,8 +170,8 @@ export function StorageRockVisual({ rockId }: Readonly<{ rockId: RockId }>) {
   return (
     <span className="storage-rock" data-rock={rockId} aria-hidden="true">
       {failed ? <span className="storage-rock__fallback"><span className="storage-rock__shine" /></span> : null}
-      {!failed ? <RasterLayer className="visual-layer visual-layer--rock" layer="rock" src={ROCK_VISUAL_SPECS[rockId].src} onError={() => setFailed(true)} /> : null}
-      {!failed ? <RasterLayer className="visual-layer visual-layer--face" layer="face-neutral" src={faceNeutralSrc} onError={() => setFailed(true)} /> : null}
+      {!failed ? <RasterLayer className="visual-layer visual-layer--rock" layer="rock" src={ROCK_VISUAL_SPECS[rockId].src} fallbackSrc={ROCK_VISUAL_SPECS[rockId].fallbackSrc} onError={() => setFailed(true)} /> : null}
+      {!failed ? <RasterLayer className="visual-layer visual-layer--face" layer="face-neutral" src={faceNeutralSrc} fallbackSrc={faceNeutralFallbackSrc} onError={() => setFailed(true)} /> : null}
     </span>
   )
 }

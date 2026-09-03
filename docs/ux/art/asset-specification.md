@@ -2,11 +2,11 @@
 
 ## 목적과 기준
 
-이 문서는 Issue #89에 전달된 PNG 37종과 성장 정체를 숨기기 위한 이름 중립 runtime alias 2종을 기록합니다. 이전 문서의 WebP 8종 제안보다 이 PNG 구조를 우선합니다. 제품의 `RockId`, `PlantId`, 성장 시간, 저장 형식과 navigation 계약은 변경하지 않습니다.
+이 문서는 Issue #89에 전달된 PNG 37종, 성장 정체를 숨기기 위한 이름 중립 runtime alias 2종, WebView 디코딩 부하를 줄이는 화면용 runtime 파생본 16종을 기록합니다. 이전 문서의 WebP 8종 제안보다 이 PNG 구조를 우선합니다. 제품의 `RockId`, `PlantId`, 성장 시간, 저장 형식과 navigation 계약은 변경하지 않습니다.
 
-에셋은 사용자 제공본이며 코드에서 재압축하거나 색을 보정하지 않았습니다. 편집 가능한 원본, 제작 도구, export 설정, 저작권과 제3자 라이선스 정보는 전달되지 않아 **미확인**입니다. PNG header와 alpha channel, 실제 pixel alpha bounds, 파일 hash만 저장소에서 확인했습니다.
+원본 에셋은 사용자 제공본 그대로 보존합니다. `assets/runtime` 파생본은 원본의 투명 canvas와 종횡비를 유지한 채 high-quality bicubic 방식으로 화면의 최대 표시 크기에 맞춰 축소한 PNG이며 별도 색 보정은 하지 않았습니다. 편집 가능한 원본, 제작 도구, 원본 export 설정, 저작권과 제3자 라이선스 정보는 전달되지 않아 **미확인**입니다. PNG header와 alpha channel, 실제 pixel alpha bounds, 파일 hash만 저장소에서 확인했습니다.
 
-전체 revision은 파일의 상대 경로와 SHA-256을 정렬해 연결한 manifest의 SHA-256인 `9b3b8ed8b80601ea668d86ddf1e43600183c752eef82a8dfc49c9b330864ccf2`입니다. 아래 표의 revision은 각 파일 SHA-256 앞 12자리이며 원본 대조에는 전체 hash를 사용합니다.
+전체 revision은 파일의 상대 경로와 SHA-256을 정렬해 연결한 manifest의 SHA-256인 `2d14e4e74a5fd160fab6d6feff3d93ab1ab2cd83deb355a47e6ec8cf09a15957`입니다. 아래 표의 revision은 각 파일 SHA-256 앞 12자리이며 원본 대조에는 전체 hash를 사용합니다.
 
 ## 좌표 계약
 
@@ -83,6 +83,21 @@ anchor는 현재 합성 접점의 runtime 기준입니다. runtime visible bound
 | `environment/props/prop-grass-01.png` | 1254×1254 | yes | `[.0486,.0167,.9322,.9833]` | `8d2c5ad991fa` |
 | `environment/props/prop-leaf-01.png` | 1254×1254 | yes | `[.0582,.0167,.9131,.9498]` | `d80eb699302d` |
 
+## 화면용 runtime 파생본
+
+파생본은 원본을 대체하거나 삭제하지 않습니다. 화면은 파생본을 우선 사용하고, 해당 파일의 load/decode가 실패할 때만 원본 URL을 한 번 재시도합니다. 식물은 두 소스가 모두 실패해도 과거 prototype SVG를 표시하지 않아 잘못된 식물 정체가 노출되지 않습니다. Storage의 식물 이미지는 비동기 decode와 lazy loading을 사용합니다.
+
+| 파일군 | canvas | 개수 | SHA-256 revision 앞 12자리 |
+| --- | ---: | ---: | --- |
+| `runtime/rocks/rock-01..03.png` | 768×768 | 3 | `9213124b834d`, `6721d9befdc9`, `26a4cefa0974` |
+| `runtime/faces/face-neutral.png`, `face-happy.png` | 512×512 | 2 | `4e4e3ba5e723`, `43fc2e19719d` |
+| `runtime/plants/plant-01..03.png` | 640×640 | 3 | `d087430cbadd`, `5272fc8c747f`, `ea9ff341ca1e` |
+| `runtime/fx/fx-growth.png`, `fx-soil.png`, `fx-sparkle.png`, `fx-touch.png` | 512×512 | 4 | `106fd0c33a49`, `cfcabb9a8ae3`, `5b773146d690`, `0adadc23dce2` |
+| `runtime/environment/rock-ground.png` | 724×543 | 1 | `240a2bcf35ef` |
+| `runtime/backgrounds/background-home.png`, `background-draw.png`, `background-collection.png` | 756×1344 | 3 | `eca6d09cb66d`, `fa65cf483c9e`, `7c9f0f41d7b` |
+
+16개 파생본의 저장소 용량은 8.40 MiB입니다. S04 최초 화면에서 필요한 background와 현재 PlantId 3종의 encoded 용량은 5.39 MiB에서 3.14 MiB로 줄고, RGBA decode 대상 pixel 메모리는 약 19.5 MiB에서 8.6 MiB로 줄어듭니다. 756px 너비 viewport에서는 배경을 native width로 표시하고, foreground는 실제 최대 렌더 크기보다 큰 canvas를 유지합니다.
+
 ## Runtime 사용 범위
 
 | 화면 | 조합과 순서 |
@@ -102,7 +117,7 @@ seed, pot, weather 대응 PNG는 제공되지 않았습니다. seed와 pot은 �
 
 ## Fallback, motion과 반응형
 
-rock/face/plant 이미지가 load 또는 decode되지 않으면 broken-image icon 대신 같은 context의 기존 SVG/CSS placeholder를 보여줍니다. 배경은 CSS gradient/base color를 뒤에 유지합니다. 외부 wrapper의 기존 크기와 button을 유지하므로 투명 canvas가 touch target을 줄이지 않습니다.
+rock/face 이미지는 화면용 파생본이 load 또는 decode되지 않으면 제공 원본을 한 번 재시도하고, 최종 실패 시 broken-image icon 대신 같은 context의 기존 SVG/CSS placeholder를 보여줍니다. plant도 제공 원본을 재시도하지만 최종 실패 시 과거 prototype 식물 대신 레이어를 숨깁니다. 배경은 CSS gradient/base color를 뒤에 유지합니다. 외부 wrapper의 기존 크기와 button을 유지하므로 투명 canvas가 touch target을 줄이지 않습니다.
 
 Home touch와 S03 FX는 transform/opacity만 사용하며 직접 interaction은 기존 220~320ms 범위를 유지합니다. `prefers-reduced-motion: reduce`에서는 touch/soil/growth/sparkle transform animation을 제거하지만 happy face와 최종 상태는 즉시 표시합니다. OS dark mode는 게임 배경을 다른 palette로 교체하지 않습니다.
 

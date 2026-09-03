@@ -36,19 +36,25 @@
   position: relative;
   width: 100%;
   aspect-ratio: 1;
+}
+
+.home-rock__character {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
   transform-origin: 50% 88%;
 }
 
-.home-rock--reacting {
+.home-rock__character--reacting {
   animation: home-rock-nudge 650ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .home-rock__ground { z-index: 0; transform: translateY(31%) scale(1.18, 0.68); }
 .home-rock__fallback { z-index: 1; }
-.home-rock > .visual-layer--rock { z-index: 2; }
-.home-rock > .visual-layer--face { z-index: 3; }
-.home-rock > .visual-layer--equipped-plant { z-index: 4; }
-.home-rock > .visual-layer--touch-fx { z-index: 5; }
+.home-rock__character > .visual-layer--rock { z-index: 2; }
+.home-rock__character > .visual-layer--face { z-index: 3; }
+.home-rock__character > .visual-layer--equipped-plant { z-index: 4; }
+.home-rock__character > .visual-layer--touch-fx { z-index: 5; }
 
 .home-rock__body { fill: #92938e; stroke: #676963; stroke-width: 3; }
 .home-rock__shadow { fill: rgba(63, 60, 54, 0.15); }
@@ -72,13 +78,7 @@
   transform: scale(0.72) translateY(4%);
 }
 
-.plant-fallback__growth {
-  fill: #739a60;
-  stroke: #58754a;
-  stroke-width: 8;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
+.visual-asset-fallback { visibility: hidden; }
 
 .s03-growth-visual,
 .s03-completed-plant {
@@ -109,32 +109,6 @@
 .s03-growth-visual .visual-layer--soil-fx { z-index: 2; transform: translateY(-5%) scale(0.45); }
 .s03-growth-visual .visual-layer--growth-fx { z-index: 3; opacity: 0.58; transform: translate(10%, -16%) scale(0.18); }
 .s03-completed-plant .visual-layer--sparkle-fx { z-index: 2; transform: translate(24%, -28%) scale(0.24); }
-
-.s03-growth-fallback {
-  position: absolute;
-  z-index: 0;
-  left: 50%;
-  bottom: 50%;
-  width: 8px;
-  height: 56px;
-  border-radius: 8px;
-  background: #739a60;
-  transform: translateX(-50%);
-}
-
-.s03-growth-fallback--planted { height: 28px; }
-.s03-growth-fallback--growing::before,
-.s03-growth-fallback--growing::after {
-  position: absolute;
-  bottom: 18px;
-  width: 30px;
-  height: 18px;
-  border-radius: 90% 15%;
-  background: #739a60;
-  content: '';
-}
-.s03-growth-fallback--growing::before { right: 2px; transform: rotate(24deg); }
-.s03-growth-fallback--growing::after { left: 2px; transform: scaleX(-1) rotate(24deg); }
 
 .storage-rock,
 .storage-plant {
@@ -176,7 +150,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .home-rock--reacting { animation: none; }
+  .home-rock__character--reacting { animation: none; }
   .visual-layer--touch-fx,
   .visual-layer--soil-fx,
   .visual-layer--growth-fx,

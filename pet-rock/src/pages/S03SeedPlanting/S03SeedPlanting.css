@@ -16,7 +16,7 @@
   overflow: hidden;
   color: var(--s03-ink);
   background:
-    url('../../assets/environment/backgrounds/background-draw.png') center / cover no-repeat,
+    url('../../assets/runtime/backgrounds/background-draw.png') center / cover no-repeat,
     radial-gradient(circle at 50% 36%, rgba(236, 230, 207, 0.55), transparent 34%),
     var(--s03-paper);
 }
