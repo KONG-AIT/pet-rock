@@ -3,8 +3,8 @@ import { useState } from 'react'
 import growthFxSrc from '../../assets/fx/fx-growth-01.png'
 import soilFxSrc from '../../assets/fx/fx-soil-01.png'
 import sparkleFxSrc from '../../assets/fx/fx-sparkle-01.png'
-import plantedSrc from '../../assets/plants/plant-02/stage-01.png'
-import growingSrc from '../../assets/plants/plant-02/stage-02.png'
+import plantedSrc from '../../assets/growth/growth-planted.png'
+import growingSrc from '../../assets/growth/growth-growing.png'
 import plant01Src from '../../assets/plants/plant-01/stage-03.png'
 import plant02Src from '../../assets/plants/plant-02/stage-03.png'
 import plant03Src from '../../assets/plants/plant-03/stage-03.png'
@@ -77,10 +77,15 @@ export function CompletedPlantVisual({ plantId }: Readonly<{ plantId: PlantId }>
 }
 
 export function GrowthPlantVisual({ stage }: Readonly<{ stage: 'planted' | 'growing' }>) {
+  const spec = SHARED_GROWTH_SPECS[stage]
   return (
     <span className={`s03-growth-visual s03-growth-visual--${stage}`} data-growth-stage={stage} aria-hidden="true">
-      <span className={`s03-growth-fallback s03-growth-fallback--${stage}`} />
-      <span className="visual-layer visual-layer--growth-plant" data-layer={`plant-stage-${stage === 'planted' ? '01' : '02'}`} />
+      <PlantImage
+        src={spec.src}
+        layer={`plant-stage-${stage === 'planted' ? '01' : '02'}`}
+        className="visual-layer visual-layer--growth-plant"
+        fallback={<span className={`s03-growth-fallback s03-growth-fallback--${stage}`} />}
+      />
       <DecorativeImage className="visual-layer visual-layer--soil-fx" layer="soil-fx" src={soilFxSrc} />
       {stage === 'growing' ? <DecorativeImage className="visual-layer visual-layer--growth-fx" layer="growth-fx" src={growthFxSrc} /> : null}
     </span>

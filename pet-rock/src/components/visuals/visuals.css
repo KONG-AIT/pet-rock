@@ -10,6 +10,11 @@
   user-select: none;
 }
 
+.visual-layer--face {
+  transform: scale(0.62);
+  transform-origin: 50% 52%;
+}
+
 .rock-visual__fallback,
 .home-rock__fallback {
   position: absolute;
@@ -60,6 +65,9 @@
   transform-origin: 50% 100%;
 }
 
+.home-rock--rock-02 .visual-layer--equipped-plant { bottom: 66%; }
+.home-rock--rock-03 .visual-layer--equipped-plant { bottom: 68%; }
+
 .visual-layer--touch-fx {
   transform: scale(0.72) translateY(4%);
 }
@@ -86,25 +94,21 @@
 .s03-growth-visual .visual-layer--growth-plant,
 .s03-completed-plant .visual-layer--growth-plant {
   z-index: 1;
-  transform: translateY(-18%) scale(0.72);
+  transform: translateY(-50%) scale(0.47);
   transform-origin: 50% 100%;
 }
 
 .s03-growth-visual .visual-layer--growth-plant {
-  background: center / contain no-repeat url('../../assets/plants/plant-02/stage-02.png');
+  transform: translateY(-47%) scale(0.55);
 }
 
 .s03-growth-visual--planted .visual-layer--growth-plant {
-  background-image: url('../../assets/plants/plant-02/stage-01.png');
+  transform: translateY(-53%) scale(0.65);
 }
 
-.s03-growth-visual--planted .visual-layer--growth-plant {
-  transform: translateY(-3%) scale(0.55);
-}
-
-.s03-growth-visual .visual-layer--soil-fx { z-index: 2; transform: scale(0.56) translateY(22%); }
-.s03-growth-visual .visual-layer--growth-fx { z-index: 3; transform: scale(0.68) translateY(-8%); }
-.s03-completed-plant .visual-layer--sparkle-fx { z-index: 2; transform: scale(0.86) translateY(-4%); }
+.s03-growth-visual .visual-layer--soil-fx { z-index: 2; transform: translateY(-5%) scale(0.45); }
+.s03-growth-visual .visual-layer--growth-fx { z-index: 3; opacity: 0.58; transform: translate(10%, -16%) scale(0.18); }
+.s03-completed-plant .visual-layer--sparkle-fx { z-index: 2; transform: translate(24%, -28%) scale(0.24); }
 
 .s03-growth-fallback {
   position: absolute;

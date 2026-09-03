@@ -37,6 +37,7 @@ describe('shared rock visuals', () => {
     const storage = renderToStaticMarkup(<StorageRockVisual rockId={rockId} />)
 
     expect(selection).toContain(`src="${source}"`)
+    expect(selection).not.toContain('rock-visual__fallback')
     expect(home).toContain(`src="${source}"`)
     expect(storage).toContain(`src="${source}"`)
   })

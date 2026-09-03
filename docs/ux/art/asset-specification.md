@@ -2,30 +2,30 @@
 
 ## 목적과 기준
 
-이 문서는 Issue #89에 전달된 PNG를 실제 runtime inventory로 기록합니다. 이전 문서의 WebP 8종 제안보다 이 문서의 PNG 37종 구조를 우선합니다. 제품의 `RockId`, `PlantId`, 성장 시간, 저장 형식과 navigation 계약은 변경하지 않습니다.
+이 문서는 Issue #89에 전달된 PNG 37종과 성장 정체를 숨기기 위한 이름 중립 runtime alias 2종을 기록합니다. 이전 문서의 WebP 8종 제안보다 이 PNG 구조를 우선합니다. 제품의 `RockId`, `PlantId`, 성장 시간, 저장 형식과 navigation 계약은 변경하지 않습니다.
 
 에셋은 사용자 제공본이며 코드에서 재압축하거나 색을 보정하지 않았습니다. 편집 가능한 원본, 제작 도구, export 설정, 저작권과 제3자 라이선스 정보는 전달되지 않아 **미확인**입니다. PNG header와 alpha channel, 실제 pixel alpha bounds, 파일 hash만 저장소에서 확인했습니다.
 
-전체 revision은 파일의 상대 경로와 SHA-256을 정렬해 연결한 manifest의 SHA-256인 `eb59ca9d90054e4f18fc7b3757a46d8d71c1a4b024c2e6926da72144582d1315`입니다. 아래 표의 revision은 각 파일 SHA-256 앞 12자리이며 원본 대조에는 전체 hash를 사용합니다.
+전체 revision은 파일의 상대 경로와 SHA-256을 정렬해 연결한 manifest의 SHA-256인 `9b3b8ed8b80601ea668d86ddf1e43600183c752eef82a8dfc49c9b330864ccf2`입니다. 아래 표의 revision은 각 파일 SHA-256 앞 12자리이며 원본 대조에는 전체 hash를 사용합니다.
 
 ## 좌표 계약
 
-`bounds`는 alpha가 0보다 큰 pixel을 모두 포함하는 `[x, y, width, height]` normalized 값입니다. 좌상단은 `(0, 0)`, 우하단은 `(1, 1)`입니다. 배경은 전체 canvas가 불투명하여 `[0,0,1,1]`입니다.
+runtime `visible bounds`는 육안으로 보이지 않는 edge noise를 제외하기 위해 alpha가 128 이상인 pixel을 포함하는 `[x, y, width, height]` normalized 값입니다. 좌상단은 `(0, 0)`, 우하단은 `(1, 1)`입니다. 배경은 전체 canvas가 불투명하여 `[0,0,1,1]`입니다.
 
 runtime anchor는 다음과 같습니다.
 
 | 역할 | ID | visible bounds | anchor |
 | --- | --- | --- | --- |
-| rock | `rock-01` | `[0,.0159,.9522,.9841]` | `groundY=1`, `plant=(.5,.19)` |
-| rock | `rock-02` | `[.0367,.0415,.9370,.9250]` | `groundY=.9665`, `plant=(.5,.20)` |
-| rock | `rock-03` | `[.0622,.0415,.8852,.8756]` | `groundY=.9171`, `plant=(.5,.20)` |
-| shared planted | `plant-02/stage-01` | `[.2859,.7063,.4281,.2891]` | `stem=(.5,.9953)` |
-| shared growing | `plant-02/stage-02` | `[.1766,.3422,.6484,.6531]` | `stem=(.5,.9953)` |
+| rock | `rock-01` | `[.082,.171,.864,.687]` | `groundY=.858`, `plant=(.5,.19)` |
+| rock | `rock-02` | `[.039,.320,.926,.438]` | `groundY=.758`, `plant=(.5,.34)` |
+| rock | `rock-03` | `[.065,.289,.880,.469]` | `groundY=.758`, `plant=(.5,.31)` |
+| shared planted | `growth/growth-planted` | `[.286,.706,.427,.289]` | `stem=(.5,.9953)` |
+| shared growing | `growth/growth-growing` | `[.178,.344,.645,.650]` | `stem=(.5,.9953)` |
 | final | `plant-01/stage-03` | `[0,.0167,.9904,.9530]` | `stem=(.5,.9697)` |
 | final | `plant-02/stage-03` | `[.0734,.0234,.8531,.9719]` | `stem=(.5,.9953)` |
 | final | `plant-03/stage-03` | `[0,.0112,.9633,.9633]` | `stem=(.5,.9745)` |
 
-anchor는 현재 합성 접점의 runtime 기준입니다. alpha bounds는 pixel scan 측정값이고 anchor는 접합 위치를 육안 검수해 정한 값입니다. renderer와 이 표는 같은 normalized metadata를 사용합니다.
+anchor는 현재 합성 접점의 runtime 기준입니다. runtime visible bounds는 alpha 128 threshold pixel scan 측정값이고 anchor는 접합 위치를 육안 검수해 정한 값입니다. 아래 inventory 표의 bounds는 파일 무결성 기록을 위한 alpha 0 초과 envelope이므로 runtime 배치에는 사용하지 않습니다. renderer와 위 표는 같은 normalized metadata를 사용합니다.
 
 ## 실제 inventory
 
@@ -46,6 +46,8 @@ anchor는 현재 합성 접점의 runtime 기준입니다. alpha bounds는 pixel
 
 | 파일 | canvas | alpha | normalized bounds | revision |
 | --- | ---: | --- | --- | --- |
+| `growth/growth-planted.png` | 640×640 | yes | `[.2859,.7063,.4281,.2891]` | `02375623f927` |
+| `growth/growth-growing.png` | 640×640 | yes | `[.1766,.3422,.6484,.6531]` | `f94274573bfa` |
 | `plants/plant-01/stage-01.png` | 1254×1254 | yes | `[.0136,.0159,.9577,.9522]` | `f2386bab35ac` |
 | `plants/plant-01/stage-02.png` | 1254×1254 | yes | `[.0136,.0152,.9673,.9530]` | `f04aaf4fbdea` |
 | `plants/plant-01/stage-03.png` | 1254×1254 | yes | `[0,.0167,.9904,.9530]` | `fa57a1d6ab3e` |
@@ -92,7 +94,7 @@ anchor는 현재 합성 접점의 runtime 기준입니다. alpha bounds는 pixel
 | S03 completed | ID별 stage-03 → sparkle FX → 기존 pot SVG → UI |
 | S04 | 배경 → owned stage-03 또는 rock+neutral face → badge/action UI |
 
-S03의 공통 stage-01/02는 `plant-02` 파일을 시각 역할로 재사용하지만 성장 중 DOM에는 `resultPlantId`를 넣지 않습니다. 실제 `PlantId`와 stage-03은 완료 후에만 공개합니다.
+S03의 공통 stage-01/02 alias는 전달된 `plant-02/stage-01/02`와 byte 및 SHA-256이 같은 파일입니다. 중립 이름의 alias를 import해 성장 중 DOM과 개발 asset URL에도 `resultPlantId`가 나타나지 않게 합니다. 실제 `PlantId`와 stage-03은 완료 후에만 공개합니다.
 
 현재 domain ID 세 개에 필요한 rock, neutral/happy face, stage-03 세 개, 공통 stage-01/02, 사용 FX, ground와 세 배경만 정적으로 import합니다. `plant-04/05`, sleepy/surprised/content face, props와 나머지 FX는 전달 inventory로 보존하지만 현재 상태나 새 domain ID를 만들지 않으며 production bundle에 포함하지 않습니다.
 

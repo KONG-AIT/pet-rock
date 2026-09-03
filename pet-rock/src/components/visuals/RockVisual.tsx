@@ -23,21 +23,21 @@ export type RockVisualSpec = Readonly<{
 export const ROCK_VISUAL_SPECS: Readonly<Record<RockId, RockVisualSpec>> = {
   'rock-01': {
     src: rock01Src,
-    visibleBounds: { x: 0, y: 0.0159, width: 0.9522, height: 0.9841 },
-    groundY: 1,
+    visibleBounds: { x: 0.082, y: 0.171, width: 0.864, height: 0.687 },
+    groundY: 0.858,
     plantAnchor: { x: 0.5, y: 0.19 },
   },
   'rock-02': {
     src: rock02Src,
-    visibleBounds: { x: 0.0367, y: 0.0415, width: 0.937, height: 0.925 },
-    groundY: 0.9665,
-    plantAnchor: { x: 0.5, y: 0.2 },
+    visibleBounds: { x: 0.039, y: 0.32, width: 0.926, height: 0.438 },
+    groundY: 0.758,
+    plantAnchor: { x: 0.5, y: 0.34 },
   },
   'rock-03': {
     src: rock03Src,
-    visibleBounds: { x: 0.0622, y: 0.0415, width: 0.8852, height: 0.8756 },
-    groundY: 0.9171,
-    plantAnchor: { x: 0.5, y: 0.2 },
+    visibleBounds: { x: 0.065, y: 0.289, width: 0.88, height: 0.469 },
+    groundY: 0.758,
+    plantAnchor: { x: 0.5, y: 0.31 },
   },
 }
 
@@ -93,14 +93,13 @@ function HomeFaceFallback() {
   )
 }
 
-function RasterLayer({ className, layer, src, onError, onLoad }: Readonly<{
+function RasterLayer({ className, layer, src, onError }: Readonly<{
   className: string
   layer: string
   src: string
   onError(): void
-  onLoad?(): void
 }>) {
-  return <img className={className} data-layer={layer} src={src} alt="" draggable={false} onError={(event) => { event.currentTarget.hidden = true; onError() }} onLoad={onLoad} />
+  return <img className={className} data-layer={layer} src={src} alt="" draggable={false} onError={(event) => { event.currentTarget.hidden = true; onError() }} />
 }
 
 export function SelectionRockVisual({ rockId, label, large = false }: Readonly<{
@@ -109,15 +108,14 @@ export function SelectionRockVisual({ rockId, label, large = false }: Readonly<{
   large?: boolean
 }>) {
   const [failed, setFailed] = useState(false)
-  const [loaded, setLoaded] = useState(false)
   return (
     <span
       aria-label={label}
       className={`s01-rock-illustration s01-rock-illustration--${rockId}${large ? ' s01-rock-illustration--large' : ''}`}
       role="img"
     >
-      {!loaded || failed ? <SelectionFallback rockId={rockId} /> : null}
-      {!failed ? <RasterLayer className="visual-layer visual-layer--rock" layer="rock" src={ROCK_VISUAL_SPECS[rockId].src} onError={() => setFailed(true)} onLoad={() => setLoaded(true)} /> : null}
+      {failed ? <SelectionFallback rockId={rockId} /> : null}
+      {!failed ? <RasterLayer className="visual-layer visual-layer--rock" layer="rock" src={ROCK_VISUAL_SPECS[rockId].src} onError={() => setFailed(true)} /> : null}
       {!failed ? <RasterLayer className="visual-layer visual-layer--face" layer="face-neutral" src={faceNeutralSrc} onError={() => setFailed(true)} /> : null}
     </span>
   )
@@ -131,12 +129,11 @@ export function HomeRockVisual({ rockId, equippedPlantId, reacting, reactionKey 
 }>) {
   const [rockFailed, setRockFailed] = useState(false)
   const [faceFailed, setFaceFailed] = useState(false)
-  const [rockLoaded, setRockLoaded] = useState(false)
   return (
-    <div key={reactionKey} className={`home-rock${reacting ? ' home-rock--reacting' : ''}`}>
+    <div key={reactionKey} className={`home-rock home-rock--${rockId}${reacting ? ' home-rock--reacting' : ''}`}>
       <RasterLayer className="visual-layer home-rock__ground" layer="ground" src={groundSrc} onError={() => undefined} />
-      {!rockLoaded || rockFailed ? <HomeFallback rockId={rockId} /> : null}
-      {!rockFailed ? <RasterLayer className="visual-layer visual-layer--rock" layer="rock" src={ROCK_VISUAL_SPECS[rockId].src} onError={() => setRockFailed(true)} onLoad={() => setRockLoaded(true)} /> : null}
+      {rockFailed ? <HomeFallback rockId={rockId} /> : null}
+      {!rockFailed ? <RasterLayer className="visual-layer visual-layer--rock" layer="rock" src={ROCK_VISUAL_SPECS[rockId].src} onError={() => setRockFailed(true)} /> : null}
       {faceFailed ? <HomeFaceFallback /> : null}
       {!faceFailed ? <RasterLayer className="visual-layer visual-layer--face" layer={reacting ? 'face-happy' : 'face-neutral'} src={reacting ? faceHappySrc : faceNeutralSrc} onError={() => setFaceFailed(true)} /> : null}
       {equippedPlantId === null ? null : <EquippedPlantVisual plantId={equippedPlantId} />}
@@ -147,11 +144,10 @@ export function HomeRockVisual({ rockId, equippedPlantId, reacting, reactionKey 
 
 export function StorageRockVisual({ rockId }: Readonly<{ rockId: RockId }>) {
   const [failed, setFailed] = useState(false)
-  const [loaded, setLoaded] = useState(false)
   return (
     <span className="storage-rock" data-rock={rockId} aria-hidden="true">
-      {!loaded || failed ? <span className="storage-rock__fallback"><span className="storage-rock__shine" /></span> : null}
-      {!failed ? <RasterLayer className="visual-layer visual-layer--rock" layer="rock" src={ROCK_VISUAL_SPECS[rockId].src} onError={() => setFailed(true)} onLoad={() => setLoaded(true)} /> : null}
+      {failed ? <span className="storage-rock__fallback"><span className="storage-rock__shine" /></span> : null}
+      {!failed ? <RasterLayer className="visual-layer visual-layer--rock" layer="rock" src={ROCK_VISUAL_SPECS[rockId].src} onError={() => setFailed(true)} /> : null}
       {!failed ? <RasterLayer className="visual-layer visual-layer--face" layer="face-neutral" src={faceNeutralSrc} onError={() => setFailed(true)} /> : null}
     </span>
   )
