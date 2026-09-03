@@ -75,7 +75,25 @@
 .home-rock--rock-03 .visual-layer--equipped-plant { bottom: 68%; }
 
 .visual-layer--touch-fx {
-  transform: scale(0.72) translateY(4%);
+  inset: auto;
+  left: var(--touch-x);
+  top: var(--touch-y);
+  width: 54%;
+  height: 54%;
+  overflow: visible;
+  transform: translate(-50%, -50%);
+}
+
+.touch-fx__particle-slot {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+.touch-fx__particle {
+  opacity: 0;
+  transform-origin: 50% 50%;
+  animation: touch-fx-drift 600ms cubic-bezier(0.2, 0.72, 0.3, 1) var(--particle-delay) forwards;
 }
 
 .visual-asset-fallback { visibility: hidden; }
@@ -149,8 +167,27 @@
   76% { transform: rotate(-0.5deg) translateY(0); }
 }
 
+@keyframes touch-fx-drift {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 7px, 0) rotate(0) scale(0.42);
+  }
+  18% { opacity: 0.88; }
+  68% { opacity: 0.5; }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--particle-drift-x), var(--particle-drift-y), 0) rotate(var(--particle-rotation)) scale(var(--particle-scale));
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .home-rock__character--reacting { animation: none; }
+  .touch-fx__particle {
+    opacity: 0.8;
+    animation: none;
+    transform: scale(0.82);
+  }
+  .touch-fx__particle-slot:not(:first-child) { display: none; }
   .visual-layer--touch-fx,
   .visual-layer--soil-fx,
   .visual-layer--growth-fx,

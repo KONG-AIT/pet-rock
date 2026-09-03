@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, type CSSProperties } from 'react'
 
 import faceHappyFallbackSrc from '../../assets/faces/face-happy.png'
 import faceNeutralFallbackSrc from '../../assets/faces/face-neutral.png'
@@ -123,6 +123,73 @@ function RasterLayer({ className, layer, src, fallbackSrc, onError }: Readonly<{
   }} />
 }
 
+type TouchFxMotion = Readonly<{
+  x: number
+  y: number
+  driftX: number
+  driftY: number
+  rotation: number
+  scale: number
+}>
+
+function seededUnit(seed: number) {
+  const value = Math.sin(seed * 12.9898) * 43758.5453
+  return value - Math.floor(value)
+}
+
+// eslint-disable-next-line react-refresh/only-export-components
+export function createTouchFxMotion(reactionKey: number): TouchFxMotion {
+  const side = seededUnit(reactionKey + 1) < 0.5 ? -1 : 1
+  const edgeDistance = 13 + seededUnit(reactionKey + 2) * 8
+
+  return {
+    x: side < 0 ? edgeDistance : 100 - edgeDistance,
+    y: 42 + seededUnit(reactionKey + 3) * 28,
+    driftX: side * (22 + seededUnit(reactionKey + 4) * 18),
+    driftY: -(18 + seededUnit(reactionKey + 5) * 20),
+    rotation: side * (18 + seededUnit(reactionKey + 6) * 34),
+    scale: 0.82 + seededUnit(reactionKey + 7) * 0.24,
+  }
+}
+
+function TouchFxBurst({ reactionKey }: Readonly<{ reactionKey: number }>) {
+  const motion = createTouchFxMotion(reactionKey)
+  const burstStyle = {
+    '--touch-x': `${motion.x}%`,
+    '--touch-y': `${motion.y}%`,
+  } as CSSProperties
+  const particles = [
+    { x: motion.driftX, y: motion.driftY, rotation: motion.rotation, scale: motion.scale, delay: 0 },
+    { x: motion.driftX * 0.7, y: motion.driftY * 1.18, rotation: -motion.rotation * 0.75, scale: motion.scale * 0.68, delay: 55 },
+    { x: motion.driftX * 1.12, y: motion.driftY * 0.62, rotation: motion.rotation * 1.3, scale: motion.scale * 0.48, delay: 105 },
+  ]
+
+  return (
+    <span className="visual-layer visual-layer--touch-fx" data-layer="touch-fx" style={burstStyle}>
+      {particles.map((particle, index) => {
+        const particleStyle = {
+          '--particle-drift-x': `${particle.x}px`,
+          '--particle-drift-y': `${particle.y}px`,
+          '--particle-rotation': `${particle.rotation}deg`,
+          '--particle-scale': particle.scale,
+          '--particle-delay': `${particle.delay}ms`,
+        } as CSSProperties
+        return (
+          <span key={index} className="touch-fx__particle-slot" style={particleStyle}>
+            <RasterLayer
+              className="visual-layer__image touch-fx__particle"
+              layer={`touch-particle-${index + 1}`}
+              src={touchFxSrc}
+              fallbackSrc={touchFxFallbackSrc}
+              onError={() => undefined}
+            />
+          </span>
+        )
+      })}
+    </span>
+  )
+}
+
 export function SelectionRockVisual({ rockId, label, large = false }: Readonly<{
   rockId: RockId
   label: string
@@ -159,7 +226,7 @@ export function HomeRockVisual({ rockId, equippedPlantId, reacting, reactionKey 
         {faceFailed ? <HomeFaceFallback /> : null}
         {!faceFailed ? <RasterLayer className="visual-layer visual-layer--face" layer={reacting ? 'face-happy' : 'face-neutral'} src={reacting ? faceHappySrc : faceNeutralSrc} fallbackSrc={reacting ? faceHappyFallbackSrc : faceNeutralFallbackSrc} onError={() => setFaceFailed(true)} /> : null}
         {equippedPlantId === null ? null : <EquippedPlantVisual plantId={equippedPlantId} />}
-        {reacting ? <RasterLayer className="visual-layer visual-layer--touch-fx" layer="touch-fx" src={touchFxSrc} fallbackSrc={touchFxFallbackSrc} onError={() => undefined} /> : null}
+        {reacting ? <TouchFxBurst reactionKey={reactionKey} /> : null}
       </div>
     </div>
   )

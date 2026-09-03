@@ -10,6 +10,7 @@ import {
   SelectionRockVisual,
   StoragePlantVisual,
   StorageRockVisual,
+  createTouchFxMotion,
 } from './index'
 
 describe('shared rock visuals', () => {
@@ -53,9 +54,19 @@ describe('shared rock visuals', () => {
     expect(quiet.indexOf('data-layer="face-neutral"')).toBeLessThan(quiet.indexOf('data-layer="equipped-plant"'))
     expect(reacting).toContain('data-layer="face-happy"')
     expect(reacting.indexOf('data-layer="equipped-plant"')).toBeLessThan(reacting.indexOf('data-layer="touch-fx"'))
+    expect(reacting.match(/data-layer="touch-particle-/g)).toHaveLength(3)
     expect(reacting).toContain('home-rock__character--reacting')
     expect(reacting.indexOf('data-layer="ground"')).toBeLessThan(reacting.indexOf('home-rock__character--reacting'))
     expect(reacting).not.toContain('home-rock home-rock--rock-01 home-rock--reacting')
+  })
+
+  it('varies touch motion while keeping every burst outside the face area', () => {
+    const motions = Array.from({ length: 12 }, (_, index) => createTouchFxMotion(index + 1))
+
+    expect(new Set(motions.map(({ x, y }) => `${x.toFixed(3)},${y.toFixed(3)}`)).size).toBeGreaterThan(8)
+    expect(motions.every(({ x }) => x <= 21 || x >= 79)).toBe(true)
+    expect(motions.every(({ y }) => y >= 42 && y <= 70)).toBe(true)
+    expect(motions.every(({ driftY }) => driftY < 0)).toBe(true)
   })
 })
 

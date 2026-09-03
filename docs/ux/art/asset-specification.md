@@ -119,7 +119,7 @@ seed, pot, weather 대응 PNG는 제공되지 않았습니다. seed와 pot은 �
 
 rock/face 이미지는 화면용 파생본이 load 또는 decode되지 않으면 제공 원본을 한 번 재시도하고, 최종 실패 시 broken-image icon 대신 같은 context의 기존 SVG/CSS placeholder를 보여줍니다. plant도 제공 원본을 재시도하지만 최종 실패 시 과거 prototype 식물 대신 레이어를 숨깁니다. 배경은 CSS gradient/base color를 뒤에 유지합니다. 외부 wrapper의 기존 크기와 button을 유지하므로 투명 canvas가 touch target을 줄이지 않습니다.
 
-Home touch와 S03 FX는 transform/opacity만 사용하며 직접 interaction은 기존 220~320ms 범위를 유지합니다. `prefers-reduced-motion: reduce`에서는 touch/soil/growth/sparkle transform animation을 제거하지만 happy face와 최종 상태는 즉시 표시합니다. OS dark mode는 게임 배경을 다른 palette로 교체하지 않습니다.
+Home touch FX는 얼굴의 실제 visible bounds를 피해 rock canvas의 좌우 외곽에서 매번 다른 위치·이동·회전·크기로 생성합니다. 하나의 효과를 지연이 다른 세 잔상으로 나눠 705ms 이내에 위·바깥 방향으로 이동하며 소멸시키고, 돌과 식물만 기존의 작은 반응을 유지하며 ground는 움직이지 않습니다. S03 FX와 함께 transform/opacity만 사용합니다. `prefers-reduced-motion: reduce`에서는 touch/soil/growth/sparkle transform animation을 제거하고 touch FX 하나와 happy face, 최종 상태를 즉시 표시합니다. OS dark mode는 게임 배경을 다른 palette로 교체하지 않습니다.
 
 검수 viewport는 `320×568`, `390×844`, `412×915`, `756×1465`입니다. 모든 viewport에서 object는 `contain`, 배경은 `cover`를 사용하며 rock/face canvas는 동일 크기로 겹칩니다. plant는 normalized stem anchor 기준으로 context scale과 offset을 적용합니다.
 

@@ -10,4 +10,4 @@ export {
   SelectionRockVisual,
   StorageRockVisual,
 } from './RockVisual'
-export { FACE_VISUAL_SOURCES, ROCK_VISUAL_SPECS } from './RockVisual'
+export { createTouchFxMotion, FACE_VISUAL_SOURCES, ROCK_VISUAL_SPECS } from './RockVisual'
